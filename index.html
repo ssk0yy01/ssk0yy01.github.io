@@ -2,9 +2,11 @@
 layout: default
 ---
 <section class="hero shell">
+  <div class="hero-droplet" aria-hidden="true"></div>
   <div class="hero-copy"><p class="eyebrow">ARCHIVE</p><h1 class="handle-title">ssk0yy01<span class="accent-period">_</span></h1><a class="button-text" href="{{ '/posts/' | relative_url }}">전체 글 <span aria-hidden="true">↗</span></a></div>
   <div class="hero-visual" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit-core">S<span>_</span></div><span class="visual-label">01 / EXPLORATION</span></div>
 </section>
+<script src="{{ '/assets/hero-water.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
 <section id="categories" class="shell categories-section">
   <div class="section-intro"><h2>카테고리</h2><span class="small-label">06</span></div>
   <div class="category-grid">{% for category in site.data.categories %}<a class="category-card" href="{{ category.path | relative_url }}"><span class="card-number">{{ category.number }}</span><h3>{{ category.title }}</h3><span class="card-arrow" aria-hidden="true">↗</span></a>{% endfor %}</div>
