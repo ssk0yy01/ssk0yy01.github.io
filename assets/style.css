@@ -174,10 +174,12 @@ main { flex: 1; }
 .profile-section { scroll-margin-top: 30px; }
 .profile-section h2 { scroll-margin-top: 30px; }
 .credential-list { display: grid; gap: 10px; }
-.credential-card { display: grid; grid-template-columns: 150px minmax(0, 1fr) 18px; gap: 18px; padding: 20px; border: 1px solid var(--line); border-radius: 6px; background: #ffffff02; }
+.credential-card { display: grid; grid-template-columns: max-content minmax(0, 1fr) 18px; gap: 18px; padding: 20px; border: 1px solid var(--line); border-radius: 6px; background: #ffffff02; }
 .credential-card:hover { border-color: #75e3d070; background: #75e3d006; }
 .credential-card:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
-.credential-date { color: var(--muted); font: 11px/1.9 'DM Mono', monospace; }
+.credential-date { color: var(--muted); font: 11px/1.9 'DM Mono', monospace; white-space: nowrap; }
+.profile-timeline dt { white-space: nowrap; }
+.credential-meta { flex-wrap: wrap; align-items: baseline; }
 .credential-copy strong { display: block; font-size: 14px; font-weight: 600; line-height: 1.7; word-break: keep-all; }
 .credential-copy > span, .activity-note { display: block; margin: 7px 0 0; font-size: 12px; color: var(--muted); line-height: 1.8; }
 .credential-arrow { color: var(--cyan); }
