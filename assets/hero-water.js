@@ -3,10 +3,12 @@
   const mask = document.querySelector('#water-mask');
   const noise = document.querySelector('#water-noise');
   const displacement = document.querySelector('#water-displacement');
-  if (!hero || !mask || !noise || !displacement) return;
+  const pulse = document.querySelector('#water-pulse');
+  if (!hero || !mask || !noise || !displacement || !pulse) return;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const pointer = matchMedia('(hover: hover) and (pointer: fine)');
   let frame = 0, energy = 0, phase = 0, previous = null;
+  let pulseAge = 2, lastTime = null;
 
   function stop() {
     hero.classList.remove('is-water-active');
@@ -14,15 +16,23 @@
     frame = 0;
     energy = 0;
     previous = null;
+    pulseAge = 2;
+    lastTime = null;
     displacement.setAttribute('scale', '0');
+    pulse.setAttribute('scale', '0');
   }
 
-  function render() {
-    phase += .22;
-    energy *= .92;
+  function render(time) {
+    const dt = lastTime === null ? 1 / 60 : Math.min((time - lastTime) / 1000, .05);
+    lastTime = time;
+    phase += dt * 13.2;
+    energy *= Math.pow(.92, dt * 60);
     displacement.setAttribute('scale', (energy * (1 + .15 * Math.sin(phase))).toFixed(3));
     noise.setAttribute('baseFrequency', (.025 + .002 * Math.sin(phase)).toFixed(4));
-    if (energy > .05) frame = requestAnimationFrame(render);
+    pulseAge += dt;
+    const envelope = pulseAge < 1.2 ? Math.sin(Math.PI * pulseAge / 1.2) * Math.exp(-2 * pulseAge) : 0;
+    pulse.setAttribute('scale', (18 * envelope * Math.sin(pulseAge * Math.PI * 6)).toFixed(3));
+    if (energy > .05 || pulseAge < 1.2) frame = requestAnimationFrame(render);
     else stop();
   }
 
@@ -32,14 +42,20 @@
     const x = event.clientX - bounds.left, y = event.clientY - bounds.top;
     const distance = previous ? Math.hypot(x - previous.x, y - previous.y) : 0;
     previous = { x, y };
-    mask.setAttribute('x', (x - 48).toFixed(2));
-    mask.setAttribute('y', (y - 48).toFixed(2));
+    mask.setAttribute('x', (x - 84).toFixed(2));
+    mask.setAttribute('y', (y - 84).toFixed(2));
     energy = Math.min(5, energy + distance * .12);
     if (energy > .05) {
       hero.classList.add('is-water-active');
       if (!frame) frame = requestAnimationFrame(render);
     }
   }, { passive: true });
+  hero.addEventListener('click', event => {
+    if (motion.matches || !pointer.matches || event.detail === 0 || event.target.closest('a, button')) return;
+    pulseAge = 0;
+    hero.classList.add('is-water-active');
+    if (!frame) frame = requestAnimationFrame(render);
+  });
   hero.addEventListener('pointerleave', stop);
   hero.addEventListener('pointercancel', stop);
   window.addEventListener('blur', stop);
