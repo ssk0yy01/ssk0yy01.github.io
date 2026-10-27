@@ -165,10 +165,7 @@ main { flex: 1; }
 .profile-timeline > div:first-child { padding-top: 0; }
 .profile-timeline dt { font: 11px/1.9 'DM Mono', monospace; color: var(--muted); padding-top: 3px; }
 .profile-timeline dd { margin: 0; font-size: 14px; color: #c4ccda; word-break: keep-all; }
-.profile-project h3 { font-size: 18px; font-weight: 600; margin: 10px 0; }
-.profile-project p { max-width: 640px; color: var(--muted); font-size: 14px; word-break: keep-all; }
 .profile-tools span { color: var(--cyan); }
-.project-status { color: var(--cyan); font-size: .65em; font-weight: 400; white-space: nowrap; }
 .profile-summary { max-width: 760px; line-height: 1.9; }
 .profile-summary + .profile-summary { margin-top: 12px; }
 .profile-nav { display: flex; flex-wrap: wrap; gap: 10px; padding-bottom: 28px; }
