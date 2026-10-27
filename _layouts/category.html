@@ -15,4 +15,4 @@ layout: default
   <div class="post-list">{% for post in category_posts %}{% include post-row.html post=post %}{% endfor %}</div>
   <p class="empty-state" {% if category_posts and category_posts.size > 0 %}hidden{% endif %}>아직 글이 없습니다.</p>
 </section>
-{% if page.category_key == 'blog-docs' %}<script src="{{ '/assets/filter.js' | relative_url }}" defer></script>{% endif %}
+{% if page.category_key == 'blog-docs' %}<script src="{{ '/assets/filter.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>{% endif %}
