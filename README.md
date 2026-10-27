@@ -33,4 +33,4 @@ categories: [development]
 
 ## 블로그/기술문서 분야 필터
 
-`categories: [blog-docs]`인 글의 머리말에 `topic: web`처럼 분야를 추가합니다. 가능한 값은 `web`(웹), `system`(시스템), `network`(네트워크), `reversing`(리버싱), `crypto`(암호학), `development`(개발), `blog`(블로그), `other`(기타)입니다. 생략하면 기타에 표시됩니다. 분야 이름과 목록은 `_data/topics.yml`에서 관리합니다.
+`categories: [blog-docs]`인 글의 머리말에 `topic: web`처럼 분야를 추가합니다. 가능한 값은 `web`(웹), `system`(시스템), `network`(네트워크), `reversing`(리버싱), `crypto`(암호학), `development`(개발), `ai`(AI), `blog`(블로그), `other`(기타)입니다. 생략하면 기타에 표시됩니다. 분야 이름과 목록은 `_data/topics.yml`에서 관리합니다.

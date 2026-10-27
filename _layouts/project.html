@@ -1,0 +1,12 @@
+---
+layout: default
+---
+<article class="shell article-wrap">
+  <a class="breadcrumb" href="{{ '/about/' | relative_url }}#projects-heading">← 프로젝트 목록</a>
+  <header class="article-head">
+    <span class="small-label">{{ page.project_type }}</span>
+    <h1>{{ page.title }} <span class="project-status">({{ page.status }})</span></h1>
+    <p class="article-meta">{{ page.period }} · ssk0yy01</p>
+  </header>
+  <div class="article-body">{{ content }}</div>
+</article>
