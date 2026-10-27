@@ -42,11 +42,11 @@ main { flex: 1; }
 .water-filter { position: absolute; pointer-events: none; }
 .hero-wave { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
 .hero-wave circle { fill: none; stroke: var(--cyan); stroke-width: 1; opacity: 0; }
-.hero h1 .type-char { color: var(--text); visibility: hidden; animation: type-reveal .001s step-end forwards; animation-delay: calc(.2s + var(--char) * .11s); }
+.hero h1 .type-char { color: var(--text); opacity: 1; animation: type-reveal .01s step-end backwards; animation-delay: calc(.2s + var(--char) * .11s); }
 .hero h1 .type-char.accent-period { color: var(--cyan); }
-@keyframes type-reveal { to { visibility: visible; } }
+@keyframes type-reveal { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  .hero h1 .type-char { animation: none; visibility: visible; }
+  .hero h1 .type-char { animation: none; opacity: 1; }
 }
 .hero.is-water-active { filter: url(#hero-water); }
 @media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
