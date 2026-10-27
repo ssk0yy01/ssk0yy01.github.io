@@ -8,3 +8,4 @@ permalink: /posts/:title/
 markdown: kramdown
 exclude:
   - README.md
+  - tests

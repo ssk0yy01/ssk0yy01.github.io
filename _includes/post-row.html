@@ -1,5 +1,8 @@
 {% assign row_category = site.data.categories | where: "key", include.post.categories[0] | first %}
-<a class="post-row" href="{{ include.post.url | relative_url }}">
-  <div><span class="row-category">{{ row_category.title | default: '기록' }}</span><h3>{{ include.post.title }}</h3><p>{{ include.post.description | default: include.post.excerpt | strip_html | truncate: 100 }}</p></div>
-  <div class="row-side"><time datetime="{{ include.post.date | date: '%Y-%m-%d' }}">{{ include.post.date | date: '%Y.%m.%d' }}</time><span class="row-arrow" aria-hidden="true">↗</span></div>
+{% assign topic = site.data.topics | where: "key", include.post.topic | first %}
+<a class="post-row" href="{{ include.post.url | relative_url }}" data-topic="{{ topic.key | default: 'other' | escape }}">
+  <time datetime="{{ include.post.date | date: '%Y-%m-%d' }}">{{ include.post.date | date: '%Y.%m.%d' }}</time>
+  <h3>{{ include.post.title | escape }}</h3>
+  <span class="row-category">{% if page.category_key == 'blog-docs' %}{{ topic.title | default: '기타' }}{% else %}{{ row_category.title }}{% endif %}</span>
+  <span class="row-arrow" aria-hidden="true">↗</span>
 </a>

@@ -1,0 +1,16 @@
+- key: web
+  title: 웹
+- key: system
+  title: 시스템
+- key: network
+  title: 네트워크
+- key: reversing
+  title: 리버싱
+- key: crypto
+  title: 암호학
+- key: development
+  title: 개발
+- key: blog
+  title: 블로그
+- key: other
+  title: 기타

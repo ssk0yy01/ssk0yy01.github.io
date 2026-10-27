@@ -28,3 +28,7 @@ categories: [development]
 사용 가능한 카테고리 키는 `development`, `ctf-wargame`, `bug-bounty`, `blog-docs`, `papers-conferences`, `competitions-certificates`입니다. 메뉴에 보이는 한글 이름과 설명은 `_data/categories.yml`에서 수정합니다.
 
 자기소개는 `about/index.html`, 블로그 제목과 주소는 `_config.yml`, 색상과 레이아웃은 `assets/style.css`에서 수정합니다. GitHub 계정이 `sky070901`이 아니라면 `_config.yml`의 `url`과 레이아웃의 GitHub 링크도 함께 바꾸세요.
+
+## 블로그/기술문서 분야 필터
+
+`categories: [blog-docs]`인 글의 머리말에 `topic: web`처럼 분야를 추가합니다. 가능한 값은 `web`(웹), `system`(시스템), `network`(네트워크), `reversing`(리버싱), `crypto`(암호학), `development`(개발), `blog`(블로그), `other`(기타)입니다. 생략하면 기타에 표시됩니다. 분야 이름과 목록은 `_data/topics.yml`에서 관리합니다.

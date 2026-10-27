@@ -3,5 +3,5 @@ layout: default
 title: 전체 글
 permalink: /posts/
 ---
-<section class="page-head shell"><p class="eyebrow">ALL FIELD NOTES</p><h1>전체 글<span class="accent-period">.</span></h1><p class="page-lead">배운 것과 시도한 것을 시간 순서대로 모았습니다.</p></section>
-<section class="shell listing-section"><div class="section-heading"><h2>모든 기록</h2><span>{{ site.posts.size }} POSTS</span></div><div class="post-list">{% for post in site.posts %}{% include post-row.html post=post %}{% endfor %}</div></section>
+<section class="page-head shell"><h1>전체 글</h1></section>
+<section class="shell listing-section"><div class="section-heading"><span>{{ site.posts.size }}개</span></div><div class="post-list">{% for post in site.posts %}{% include post-row.html post=post %}{% endfor %}</div></section>
