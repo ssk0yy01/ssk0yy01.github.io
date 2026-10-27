@@ -8,7 +8,6 @@
   --text: #262626;
   --muted: #777570;
   --line: #ded8d0;
-  --strong-line: #252525;
   --hover: #e2ddd6;
   --accent: #8b4cf5;
   --rail: 52px;
@@ -56,12 +55,12 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .rail-profile { margin-top: auto; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: #fff; background: #899596; }
 .rail-profile:hover { background: #788789; }
 .rail-profile .icon { width: 21px; height: 21px; }
-.workspace { display: grid; grid-template-columns: var(--sidebar-width) minmax(0, 1fr); margin: 0 2px 2px var(--rail); height: calc(100dvh - var(--topbar) - 2px); border: 1px solid var(--strong-line); border-radius: 18px; background: var(--bg); box-shadow: -4px 0 24px #00000003; overflow: hidden; position: relative; }
-.sidebar { width: var(--sidebar-width); min-width: 0; display: flex; flex-direction: column; background: var(--sidebar); border-right: 1px solid var(--strong-line); color: var(--text); overflow-y: auto; scrollbar-width: thin; scrollbar-color: #dedcd8 transparent; }
+.workspace { display: grid; grid-template-columns: var(--sidebar-width) minmax(0, 1fr); margin: 0 2px 2px var(--rail); height: calc(100dvh - var(--topbar) - 2px); border: 1px solid var(--line); border-radius: 18px; background: var(--bg); box-shadow: -4px 0 24px #00000003; overflow: hidden; position: relative; }
+.sidebar { width: var(--sidebar-width); min-width: 0; display: flex; flex-direction: column; background: var(--sidebar); border-right: 1px solid var(--line); color: var(--text); overflow-y: auto; scrollbar-width: thin; scrollbar-color: #dedcd8 transparent; }
 .sidebar-heading { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px 10px 16px; min-height: 55px; }
 .brand { font-size: 21px; font-weight: 650; letter-spacing: -.5px; white-space: nowrap; }
 .brand span { color: var(--accent); }
-.sidebar-shortcuts { padding: 0 12px 16px; border-bottom: 1px solid var(--strong-line); }
+.sidebar-shortcuts { padding: 0 12px 16px; border-bottom: 1px solid var(--line); }
 .sidebar-shortcuts a, .category-link { display: flex; align-items: center; gap: 10px; min-height: 37px; padding: 8px 10px; border-radius: 9px; }
 .sidebar-shortcuts .icon, .category-link .icon { width: 18px; height: 18px; }
 .sidebar a:hover { background: var(--hover); }
@@ -76,7 +75,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .sidebar-post { display: block; margin-top: 3px; padding: 8px 10px 8px 38px; border-radius: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
 .main-pane { min-width: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: #d9d6d0 transparent; padding-bottom: 56px; }
 .main-pane:focus { outline: none; }
-.pane-toolbar { display: flex; align-items: center; justify-content: space-between; min-height: 50px; padding: 9px 17px 9px 26px; font-size: 13px; color: var(--muted); background: #f4f0ea; border-bottom: 1px solid var(--strong-line); }
+.pane-toolbar { display: flex; align-items: center; justify-content: space-between; min-height: 50px; padding: 9px 17px 9px 26px; font-size: 13px; color: var(--muted); background: #f4f0ea; border-bottom: 1px solid var(--line); }
 .pane-toolbar .icon { width: 16px; height: 16px; }
 .home-pane { display: flex; flex-direction: column; padding-bottom: 0; }
 .home-screen { flex: 1; display: flex; flex-direction: column; align-items: center; min-height: 420px; padding: 12px 38px 16px; }
@@ -89,7 +88,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .home-composer { width: 100%; max-width: 748px; }
 .composer-context { display: flex; align-items: center; gap: 8px; height: 39px; padding: 0 14px; margin: 0 14px; background: #efebe5; color: #85827d; border-radius: 18px 18px 0 0; font-size: 13px; }
 .composer-context .icon { width: 16px; height: 16px; }
-.composer { padding: 12px 12px 9px; border: 1px solid var(--strong-line); border-radius: 24px; box-shadow: 0 2px 8px #00000005; background: #fbf7f2; }
+.composer { padding: 12px 12px 9px; border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 2px 8px #00000005; background: #fbf7f2; }
 .composer:focus-within { border-color: #bfa6ef; }
 .composer input { display: block; width: 100%; background: none; border: none; outline: none; color: #000; padding: 3px 2px; height: 34px; }
 .composer input::placeholder { color: #a4a09a; }
