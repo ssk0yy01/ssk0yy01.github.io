@@ -46,6 +46,8 @@ categories: [development]
 | 데이터센터 보안 과정 | `_credentials/datacenter-training.md` |
 | 현대오토에버 특별상 | `_credentials/autoever-award.md` |
 | 정보처리기능사 | `_credentials/information-processing.md` |
+| THEM?! CTF 2026 · 4위 | `_credentials/them-ctf-2026.md` |
+| HITCON 2026 · 5위 | `_credentials/hitcon-2026.md` |
 
 인증 사진을 추가하는 방법:
 
