@@ -1,45 +1,44 @@
 const { readFileSync } = require('node:fs');
 const { runInNewContext } = require('node:vm');
 const assert = require('node:assert/strict');
-const source = readFileSync('assets/hero-water.js', 'utf8');
 function mount(reduced = false, fine = true) {
   const events = {}, classes = new Set(), queue = new Map();
   let next = 0;
-  const drop = { style: {} };
+  const element = () => ({ attrs: {}, setAttribute(k, v) { this.attrs[k] = v; } });
+  const mask = element(), noise = element(), displacement = element();
   const hero = {
-    querySelector: () => drop,
     classList: { add: x => classes.add(x), remove: x => classes.delete(x) },
     getBoundingClientRect: () => ({ left: 100, top: 80 }),
     addEventListener: (name, fn) => events[name] = fn
   };
-  runInNewContext(source, {
-    document: { querySelector: () => hero },
+  runInNewContext(readFileSync('assets/hero-water.js', 'utf8'), {
+    document: { querySelector: s => ({ '.hero': hero, '#water-mask': mask, '#water-noise': noise, '#water-displacement': displacement })[s] },
     window: { addEventListener: (name, fn) => events[name] = fn },
-    matchMedia: query => ({ matches: query.includes('reduce') ? reduced : fine, addEventListener() {} }),
+    matchMedia: q => ({ matches: q.includes('reduce') ? reduced : fine, addEventListener() {} }),
     requestAnimationFrame: fn => { queue.set(++next, fn); return next; },
     cancelAnimationFrame: id => queue.delete(id)
   });
-  return { events, classes, drop, queue, tick() { const pending = [...queue.values()]; queue.clear(); pending.forEach(fn => fn()); } };
+  return { events, classes, mask, displacement, queue, move(x, type = 'mouse') { events.pointermove({ clientX: x, clientY: 200, pointerType: type }); }, tick() { const pending = [...queue.values()]; queue.clear(); pending.forEach(fn => fn()); } };
 }
-const page = mount();
-page.events.pointermove({ clientX: 300, clientY: 200, pointerType: 'mouse' });
-page.tick();
-assert.match(page.drop.style.transform, /translate\(115px, 35px\)/);
-assert.equal(page.queue.size, 0);
-page.events.pointermove({ clientX: 600, clientY: 300, pointerType: 'mouse' });
-page.tick();
-assert.ok(page.queue.size > 0);
-for (let i = 0; i < 150 && page.queue.size; i++) page.tick();
-assert.equal(page.queue.size, 0, 'animation stops after settling');
-page.events.pointerleave();
-assert.equal(page.classes.size, 0);
-assert.equal(page.queue.size, 0);
+const p = mount();
+p.move(300);
+assert.equal(p.queue.size, 0, 'stationary entry does not distort');
+assert.equal(p.mask.attrs.x, '152.00');
+assert.equal(p.mask.attrs.y, '72.00');
+p.move(350); p.tick();
+assert.ok(Number(p.displacement.attrs.scale) > 0);
+assert.ok(Number(p.displacement.attrs.scale) < 6, 'subtle displacement limit');
+for (let i = 0; i < 150 && p.queue.size; i++) p.tick();
+assert.equal(p.queue.size, 0);
+assert.equal(p.classes.size, 0);
+assert.equal(p.displacement.attrs.scale, '0');
+p.move(300); p.move(350); p.events.pointerleave();
+assert.equal(p.queue.size, 0);
+assert.equal(p.displacement.attrs.scale, '0');
 for (const disabled of [mount(true), mount(false, false)]) {
-  disabled.events.pointermove({ clientX: 200, clientY: 200, pointerType: 'mouse' });
+  disabled.move(300); disabled.move(400);
   assert.equal(disabled.queue.size, 0);
-  assert.equal(disabled.classes.size, 0);
 }
-const touch = mount();
-touch.events.pointermove({ clientX: 200, clientY: 200, pointerType: 'touch' });
+const touch = mount(); touch.move(300, 'touch'); touch.move(400, 'touch');
 assert.equal(touch.queue.size, 0);
-console.log('PASS: relative position, settling, exit cleanup, reduced motion, coarse pointer and touch');
+console.log('PASS: local mask, bounded ripple, settling, exit, reduced motion and touch');
