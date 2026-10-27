@@ -8,6 +8,7 @@
     document.body.classList.toggle('sidebar-collapsed', !expanded);
     toggle.setAttribute('aria-expanded', String(expanded));
     toggle.setAttribute('aria-label', expanded ? '사이드바 접기' : '사이드바 펼치기');
+    sidebar.inert = !expanded;
     backdrop.hidden = !expanded || !mobile.matches;
     // The mobile drawer is modal; prevent focus reaching the covered content.
     document.querySelector('#main').inert = expanded && mobile.matches;

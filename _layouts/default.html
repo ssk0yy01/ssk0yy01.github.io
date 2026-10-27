@@ -29,6 +29,7 @@
     <a class="rail-link{% if page.url contains '/about/' %} selected{% endif %}" href="{{ '/about/' | relative_url }}" aria-label="소개" title="소개">{% include icon.html name='user' %}</a>
     <span class="rail-divider"></span>
     <a class="rail-link" href="https://github.com/ssk0yy01" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">{% include icon.html name='github' %}</a>
+    <a class="rail-profile" href="{{ '/about/' | relative_url }}" aria-label="이하늘 소개" title="이하늘 · ssk0yy01">{% include icon.html name='cloud' %}</a>
   </nav>
   <div class="workspace">
     <aside class="sidebar" id="sidebar" aria-label="블로그 탐색">
@@ -46,7 +47,6 @@
         </div>
         {% endfor %}
       </nav>
-      <div class="sidebar-footer"><a href="{{ '/about/' | relative_url }}"><span class="small-avatar">SK</span><span>이하늘<span class="profile-handle">ssk0yy01</span></span></a><a class="icon-button" href="https://github.com/ssk0yy01" target="_blank" rel="noopener noreferrer" aria-label="GitHub 열기">{% include icon.html name='external' %}</a></div>
     </aside>
     <button class="sidebar-backdrop" type="button" aria-label="사이드바 닫기" hidden></button>
     <main class="main-pane{% if page.url == '/' %} home-pane{% endif %}" id="main" tabindex="-1">

@@ -16,6 +16,7 @@ function mount({ mobile = false, query = '', texts = [] } = {}) {
   const backdrop = element();
   const main = element();
   const sidebarLink = element();
+  const sidebar = element({ querySelector: () => sidebarLink });
   const media = element({ matches: mobile });
   const input = element();
   const form = element({ hidden: true });
@@ -26,20 +27,22 @@ function mount({ mobile = false, query = '', texts = [] } = {}) {
   const collapsed = new Set();
   const document = element({
     body: { classList: { toggle(name, value) { value ? collapsed.add(name) : collapsed.delete(name); } } },
-    querySelector: s => ({ '#sidebar': { querySelector: () => sidebarLink }, '#sidebar-toggle': toggle, '.sidebar-backdrop': backdrop, '#main': main, '[data-sidebar-toggle]': element(), '[data-search-list]': area })[s],
+    querySelector: s => ({ '#sidebar': sidebar, '#sidebar-toggle': toggle, '.sidebar-backdrop': backdrop, '#main': main, '[data-sidebar-toggle]': element(), '[data-search-list]': area })[s],
     querySelectorAll: () => []
   });
   const history = { replaceState(_state, _title, url) { this.url = url.toString(); } };
   runInNewContext(readFileSync('assets/app.js', 'utf8'), {
     document, window: { matchMedia: () => media, location: { search: query, hash: '', href: 'https://example.com/posts/' + query }, history }, URL, URLSearchParams
   });
-  return { toggle, backdrop, main, sidebarLink, media, input, form, count, empty, posts, collapsed, history, document };
+  return { toggle, backdrop, main, sidebar, sidebarLink, media, input, form, count, empty, posts, collapsed, history, document };
 }
 const narrow = mount({ mobile: true });
 assert.equal(narrow.toggle.getAttribute('aria-expanded'), 'false');
 assert.equal(narrow.backdrop.hidden, true);
 assert.equal(narrow.main.inert, false);
+assert.equal(narrow.sidebar.inert, true);
 narrow.toggle.events.click();
+assert.equal(narrow.sidebar.inert, false);
 assert.equal(narrow.backdrop.hidden, false);
 assert.equal(narrow.main.inert, true);
 assert.equal(narrow.sidebarLink.focused, true);
@@ -47,11 +50,18 @@ narrow.document.events.keydown({ key: 'Escape' });
 assert.equal(narrow.toggle.getAttribute('aria-expanded'), 'false');
 assert.equal(narrow.main.inert, false);
 assert.equal(narrow.toggle.focused, true);
+assert.equal(narrow.sidebar.inert, true);
 narrow.media.matches = false;
 narrow.media.events.change();
 assert.equal(narrow.toggle.getAttribute('aria-expanded'), 'true');
 assert.equal(narrow.backdrop.hidden, true);
 assert.equal(narrow.main.inert, false);
+assert.equal(narrow.sidebar.inert, false);
+// A rapidly reopened drawer must not remain inert during the closing transition.
+narrow.toggle.events.click();
+assert.equal(narrow.sidebar.inert, true);
+narrow.toggle.events.click();
+assert.equal(narrow.sidebar.inert, false);
 const page = mount({ query: '?q=AI+security', texts: ['AI Security 개발', 'AI 모델 분석 블로그/기술문서', '리버싱 입문'] });
 assert.equal(page.form.hidden, false);
 assert.deepEqual(page.posts.map(p => p.hidden), [false, true, true]);

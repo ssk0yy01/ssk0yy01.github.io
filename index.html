@@ -3,15 +3,15 @@ layout: default
 ---
 <section class="home-screen">
   <div class="welcome">
-    <svg class="welcome-symbol" viewBox="0 0 64 64" aria-hidden="true"><path d="M23 7c6-5 14-3 18 2 8-1 14 6 13 14 7 5 7 15 1 20 0 9-9 15-17 12-7 5-16 2-19-4-9 0-15-9-11-17-5-7-1-16 6-19 1-4 4-7 9-8Z"/><path d="m22 25 6 8-6 8m14 0h9"/></svg>
+    <span class="welcome-symbol">{% include icon.html name='cloud' %}</span>
     <h1>ssk0yy01<span class="accent-period">_</span></h1>
   </div>
   <div class="home-composer">
-    <div class="composer-context">{% include icon.html name='folder' %}<span>기록 보관함</span><span class="context-divider"></span>{% include icon.html name='book' %}<span>전체 글</span></div>
+    <div class="composer-context"><span class="access-label">{% include icon.html name='shield' %}전체 액세스</span><span class="context-item">{% include icon.html name='folder' %}기록 보관함</span><span class="context-item context-posts">{% include icon.html name='book' %}전체 글</span></div>
     <form class="composer" action="{{ '/posts/' | relative_url }}" method="get" role="search">
       <label class="sr-only" for="home-search">블로그 글 검색</label>
       <input id="home-search" name="q" type="search" placeholder="어떤 기록을 찾고 있나요?" autocomplete="off">
-      <div class="composer-bottom"><span>ssk0yy01의 기록</span><button class="send-button" type="submit" aria-label="검색">{% include icon.html name='arrow-up' %}</button></div>
+      <div class="composer-bottom"><span class="model-label">이하늘-블로그 <span class="model-tier">Ultra</span></span><button class="send-button" type="submit" aria-label="검색">{% include icon.html name='arrow-up' %}</button></div>
     </form>
   </div>
 </section>
