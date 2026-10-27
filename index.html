@@ -9,4 +9,6 @@ layout: default
   <div class="section-intro"><h2>카테고리</h2><span class="small-label">06</span></div>
   <div class="category-grid">{% for category in site.data.categories %}<a class="category-card" href="{{ category.path | relative_url }}"><span class="card-number">{{ category.number }}</span><h3>{{ category.title }}</h3><span class="card-arrow" aria-hidden="true">↗</span></a>{% endfor %}</div>
 </section>
+{% if site.posts.size > 0 %}
 <section class="shell recent-section"><div class="section-intro"><h2>최근 글</h2><a class="view-all" href="{{ '/posts/' | relative_url }}">전체 보기 ↗</a></div><div class="post-list">{% for post in site.posts limit: 5 %}{% include post-row.html post=post %}{% endfor %}</div></section>
+{% endif %}
