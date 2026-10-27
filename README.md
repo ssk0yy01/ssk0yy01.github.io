@@ -1,13 +1,15 @@
-# sky070901의 기록
+# ssk0yy01의 기록
 
 GitHub Pages에서 동작하는 개인 학습 블로그입니다. 외부 테마와 빌드 도구 없이 GitHub Pages의 기본 Jekyll 지원을 사용합니다.
 
 ## 게시 방법
 
-1. GitHub에서 공개 저장소 `sky070901.github.io`를 만듭니다.
+1. GitHub에서 공개 저장소 `ssk0yy01.github.io`를 만듭니다.
 2. 이 폴더의 파일을 저장소 기본 브랜치의 최상위에 올립니다.
 3. 저장소 **Settings → Pages → Build and deployment**에서 **Deploy from a branch**, 기본 브랜치, **/(root)**를 선택합니다.
-4. 배포가 끝나면 `https://sky070901.github.io`에 접속합니다.
+4. 배포가 끝나면 `https://ssk0yy01.github.io`에 접속합니다.
+
+계정 이름을 변경한 뒤에는 저장소 이름도 `ssk0yy01.github.io`로 맞추고, 로컬 연결 주소를 `git remote set-url origin https://github.com/ssk0yy01/ssk0yy01.github.io.git`로 갱신합니다. 사이트의 표시 이름과 주소 설정은 새 이름으로 준비되어 있습니다.
 
 ## 글 쓰기
 
@@ -27,7 +29,7 @@ categories: [development]
 
 사용 가능한 카테고리 키는 `development`, `ctf-wargame`, `bug-bounty`, `blog-docs`, `papers-conferences`, `competitions-certificates`입니다. 메뉴에 보이는 한글 이름과 설명은 `_data/categories.yml`에서 수정합니다.
 
-자기소개는 `about/index.html`, 블로그 제목과 주소는 `_config.yml`, 색상과 레이아웃은 `assets/style.css`에서 수정합니다. GitHub 계정이 `sky070901`이 아니라면 `_config.yml`의 `url`과 레이아웃의 GitHub 링크도 함께 바꾸세요.
+자기소개는 `about/index.html`, 블로그 제목과 주소는 `_config.yml`, 색상과 레이아웃은 `assets/style.css`에서 수정합니다. GitHub 계정이 `ssk0yy01`이 아니라면 `_config.yml`의 `url`과 레이아웃의 GitHub 링크도 함께 바꾸세요.
 
 ## 블로그/기술문서 분야 필터
 

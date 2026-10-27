@@ -148,3 +148,28 @@ main { flex: 1; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; }
 }
+
+.hero h1.handle-title { font-size: clamp(45px, 6vw, 82px); overflow-wrap: anywhere; }
+.profile-head { padding-bottom: 36px; }
+.profile-head .eyebrow { color: var(--muted); margin-bottom: 12px; font-family: inherit; letter-spacing: .04em; }
+.profile-summary { max-width: 620px; margin: 22px 0 18px; color: #c4ccda; font-size: 15px; word-break: keep-all; }
+.profile-interests, .profile-tools { display: flex; flex-wrap: wrap; gap: 8px; }
+.profile-interests span, .profile-tools span { font-size: 11px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 4px; color: var(--purple); }
+.profile-links { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 23px; font-size: 12px; color: var(--muted); }
+.profile-links a:hover { color: var(--cyan); }
+.profile-sections { padding-bottom: 90px; }
+.profile-section { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 36px; padding: 32px 0; border-top: 1px solid var(--line); }
+.profile-section h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.profile-timeline { margin: 0; }
+.profile-timeline > div { display: grid; grid-template-columns: 165px minmax(0, 1fr); gap: 20px; padding-block: 8px; }
+.profile-timeline > div:first-child { padding-top: 0; }
+.profile-timeline dt { font: 11px/1.9 'DM Mono', monospace; color: var(--muted); padding-top: 3px; }
+.profile-timeline dd { margin: 0; font-size: 14px; color: #c4ccda; word-break: keep-all; }
+.profile-project h3 { font-size: 18px; font-weight: 600; margin: 10px 0; }
+.profile-project p { max-width: 640px; color: var(--muted); font-size: 14px; word-break: keep-all; }
+.profile-tools span { color: var(--cyan); }
+@media (max-width: 700px) {
+  .profile-section { grid-template-columns: 1fr; gap: 22px; padding-block: 26px; }
+  .profile-timeline > div { grid-template-columns: 1fr; gap: 3px; padding-block: 12px; }
+  .hero h1.handle-title { font-size: clamp(42px, 11vw, 66px); }
+}
