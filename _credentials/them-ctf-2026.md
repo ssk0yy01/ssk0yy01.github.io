@@ -6,7 +6,12 @@ period: "2026.05.30 — 2026.06.01"
 result: "최종 4위 · SCH_Tutoring"
 order: 2
 summary: "팀 최종 4위 · SCH_Tutoring"
-evidence: []
+evidence_position: top
+evidence:
+  - image: /assets/evidence/them-ctf-2026-certificate.png
+    caption: "THEM?! CTF 2026 공식 참가 인증서 · SCH_TUTORING"
+    width: 2330
+    height: 1655
 ---
 
 ## 대회 성적

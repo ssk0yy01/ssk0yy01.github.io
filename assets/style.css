@@ -197,6 +197,8 @@ a.credential-card:hover { border-color: #75e3d070; background: #75e3d006; }
 .evidence-gallery img { display: block; max-width: 100%; height: auto; margin-inline: auto; border: 1px solid var(--line); border-radius: 6px; }
 .evidence-gallery figcaption { text-align: center; font-size: 12px; margin-top: 10px; }
 .evidence-gallery figcaption span { color: var(--muted); }
+.evidence-gallery--top { margin: 0 0 28px; border-top: 0; }
+.evidence-gallery--top figure { margin: 0; }
 @media (max-width: 900px) {
   .credential-card { grid-template-columns: minmax(0, 1fr) 18px; gap: 7px 12px; }
   .credential-date { grid-column: 1; }
