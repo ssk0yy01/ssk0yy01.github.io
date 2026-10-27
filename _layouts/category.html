@@ -3,7 +3,7 @@ layout: default
 ---
 {% assign category = site.data.categories | where: "key", page.category_key | first %}
 {% assign category_posts = site.categories[page.category_key] %}
-<section class="page-head shell"><a class="breadcrumb" href="{{ '/' | relative_url }}">← 홈</a><h1>{{ category.title }}</h1></section>
+<section class="page-head shell"><a class="breadcrumb" href="{{ '/' | relative_url }}?v={{ site.time | date: '%s' }}">← 홈</a><h1>{{ category.title }}</h1></section>
 <section class="shell listing-section" {% if page.category_key == 'blog-docs' %}data-topic-filter{% endif %}>
   {% if page.category_key == 'blog-docs' %}
   <div class="filter-bar" role="group" aria-label="분야별 필터" hidden>

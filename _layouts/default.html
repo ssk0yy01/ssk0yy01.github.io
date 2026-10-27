@@ -19,12 +19,12 @@
     <nav class="window-menus" aria-label="블로그 메뉴">
       <details><summary>파일</summary><div class="menu-popover"><a href="{{ '/posts/' | relative_url }}">전체 글</a><a href="https://github.com/ssk0yy01/ssk0yy01.github.io" target="_blank" rel="noopener noreferrer">저장소 열기 ↗</a></div></details>
       <details><summary>편집</summary><div class="menu-popover"><a href="{{ '/posts/' | relative_url }}#search">글 검색</a></div></details>
-      <details><summary>보기</summary><div class="menu-popover"><button type="button" data-sidebar-toggle>사이드바 표시 전환</button><a href="{{ '/' | relative_url }}">홈</a></div></details>
+      <details><summary>보기</summary><div class="menu-popover"><button type="button" data-sidebar-toggle>사이드바 표시 전환</button><a href="{{ '/' | relative_url }}?v={{ site.time | date: '%s' }}">홈</a></div></details>
       <details><summary>도움말</summary><div class="menu-popover"><a href="{{ '/about/' | relative_url }}">소개</a><a href="mailto:ssk0yy01@gmail.com">이메일</a></div></details>
     </nav>
   </header>
   <nav class="app-rail" aria-label="바로가기">
-    <a class="rail-link{% if page.url == '/' %} selected{% endif %}" href="{{ '/' | relative_url }}" aria-label="홈" title="홈">{% include icon.html name='home' %}</a>
+    <a class="rail-link{% if page.url == '/' %} selected{% endif %}" href="{{ '/' | relative_url }}?v={{ site.time | date: '%s' }}" aria-label="홈" title="홈">{% include icon.html name='home' %}</a>
     <a class="rail-link{% if page.url contains '/posts/' %} selected{% endif %}" href="{{ '/posts/' | relative_url }}" aria-label="전체 글" title="전체 글">{% include icon.html name='book' %}</a>
     <a class="rail-link{% if page.url contains '/about/' %} selected{% endif %}" href="{{ '/about/' | relative_url }}" aria-label="소개" title="소개">{% include icon.html name='user' %}</a>
     <span class="rail-divider"></span>
@@ -33,7 +33,7 @@
   </nav>
   <div class="workspace">
     <aside class="sidebar" id="sidebar" aria-label="블로그 탐색">
-      <div class="sidebar-heading"><a class="brand" href="{{ '/' | relative_url }}">ssk0yy01<span>_</span></a><a class="icon-button" href="{{ '/posts/' | relative_url }}#search" aria-label="글 검색" title="검색">{% include icon.html name='search' %}</a></div>
+      <div class="sidebar-heading"><a class="brand" href="{{ '/' | relative_url }}?v={{ site.time | date: '%s' }}">ssk0yy01<span>_</span></a><a class="icon-button" href="{{ '/posts/' | relative_url }}#search" aria-label="글 검색" title="검색">{% include icon.html name='search' %}</a></div>
       <nav class="sidebar-shortcuts" aria-label="주 메뉴">
         <a href="{{ '/posts/' | relative_url }}" {% if page.url == '/posts/' %}aria-current="page"{% endif %}>{% include icon.html name='book' %}전체 글</a>
         <a href="{{ '/about/' | relative_url }}" {% if page.url == '/about/' %}aria-current="page"{% endif %}><span class="profile-dot" aria-hidden="true"></span>소개</a>
