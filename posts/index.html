@@ -4,4 +4,14 @@ title: 전체 글
 permalink: /posts/
 ---
 <section class="page-head shell"><h1>전체 글</h1></section>
-<section class="shell listing-section"><div class="section-heading"><span>{{ site.posts.size }}개</span></div><div class="post-list">{% for post in site.posts %}{% include post-row.html post=post %}{% endfor %}</div></section>
+<section class="shell listing-section" data-search-list>
+  <form class="search-form" id="search" action="{{ '/posts/' | relative_url }}" role="search" hidden>
+    {% include icon.html name='search' %}
+    <label class="sr-only" for="post-search">글 제목 및 카테고리 검색</label>
+    <input id="post-search" type="search" name="q" placeholder="제목이나 카테고리 검색" autocomplete="off">
+    <button type="submit">검색</button>
+  </form>
+  <div class="section-heading"><span class="post-count" aria-live="polite" aria-atomic="true">{{ site.posts.size }}개</span></div>
+  <div class="post-list">{% for post in site.posts %}{% include post-row.html post=post %}{% endfor %}</div>
+  <p class="empty-state" {% if site.posts.size > 0 %}hidden{% endif %}>아직 글이 없습니다.</p>
+</section>
