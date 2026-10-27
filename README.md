@@ -34,3 +34,29 @@ categories: [development]
 ## 블로그/기술문서 분야 필터
 
 `categories: [blog-docs]`인 글의 머리말에 `topic: web`처럼 분야를 추가합니다. 가능한 값은 `web`(웹), `system`(시스템), `network`(네트워크), `reversing`(리버싱), `crypto`(암호학), `development`(개발), `ai`(AI), `blog`(블로그), `other`(기타)입니다. 생략하면 기타에 표시됩니다. 분야 이름과 목록은 `_data/topics.yml`에서 관리합니다.
+
+## 학력·교육·수상·자격증과 인증 사진
+
+소개 페이지의 항목을 누르면 `_credentials`의 해당 글이 열립니다. 글 본문을 수정하면 상세 내용이 바뀌고, 머리말의 `summary`는 소개 목록의 짧은 설명입니다.
+
+| 항목 | 수정할 파일 |
+| --- | --- |
+| 순천향대학교 | `_credentials/sch-university.md` |
+| 현대오토에버 교육 수료 | `_credentials/autoever-training.md` |
+| 데이터센터 보안 과정 | `_credentials/datacenter-training.md` |
+| 현대오토에버 특별상 | `_credentials/autoever-award.md` |
+| 정보처리기능사 | `_credentials/information-processing.md` |
+
+인증 사진을 추가하는 방법:
+
+1. GitHub 저장소에서 `assets/evidence`를 열고 **Add file → Upload files**로 JPG·PNG·WebP 사진을 올립니다. 파일 이름은 `autoever-award.jpg`처럼 정합니다.
+2. 해당 글을 편집하고 머리말의 `evidence: []`를 아래처럼 바꿉니다. 사진이 여러 장이면 `- image`와 `caption`을 반복합니다.
+3. 변경을 커밋하면 GitHub Pages 배포 후 상세 글 아래에 인증 자료가 나타납니다. 사진을 누르면 원본이 새 창으로 열립니다.
+
+```yaml
+evidence:
+  - image: /assets/evidence/autoever-award.jpg
+    caption: 현대오토에버 화이트해커 양성교육 특별상 상장
+```
+
+사진이 없는 항목은 인증 자료 영역을 표시하지 않습니다. 공개할 사진에서는 학번·주민등록번호 등 공개하지 않을 정보를 먼저 가려 주세요. 방문자용 업로드 버튼은 없으며, 사진은 GitHub 저장소에서 관리합니다.

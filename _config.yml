@@ -6,6 +6,16 @@ lang: ko-KR
 timezone: Asia/Seoul
 permalink: /posts/:title/
 markdown: kramdown
+collections:
+  credentials:
+    output: true
+    permalink: /about/:name/
+defaults:
+  - scope:
+      path: ""
+      type: credentials
+    values:
+      layout: credential
 exclude:
   - README.md
   - tests
