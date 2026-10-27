@@ -1,0 +1,23 @@
+---
+layout: default
+---
+{% assign category = site.data.categories | where: "key", page.category_key | first %}
+{% assign category_posts = site.categories[page.category_key] %}
+<section class="page-head shell">
+  <a class="breadcrumb" href="{{ '/' | relative_url }}#categories">← 카테고리로 돌아가기</a>
+  <p class="eyebrow">FIELD {{ category.number }} / {{ category.english }}</p>
+  <h1>{{ category.title }}</h1>
+  <p class="page-lead">{{ category.description }}</p>
+</section>
+<section class="shell listing-section">
+  <div class="section-heading"><h2>기록</h2><span>{{ category_posts.size | default: 0 }} POSTS</span></div>
+  {% if category_posts and category_posts.size > 0 %}
+    <div class="post-list">
+      {% for post in category_posts %}
+        {% include post-row.html post=post %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state"><span aria-hidden="true">✳</span><h3>첫 기록을 준비 중입니다.</h3><p>이 주제에서 배운 것과 시도한 과정을 이곳에 차곡차곡 남길 예정입니다.</p></div>
+  {% endif %}
+</section>

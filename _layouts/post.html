@@ -1,0 +1,14 @@
+---
+layout: default
+---
+{% assign category = site.data.categories | where: "key", page.categories[0] | first %}
+<article class="shell article-wrap">
+  <a class="breadcrumb" href="{{ '/posts/' | relative_url }}">← 전체 글로 돌아가기</a>
+  <header class="article-head">
+    {% if category %}<a class="pill" href="{{ category.path | relative_url }}">{{ category.title }}</a>{% endif %}
+    <h1>{{ page.title }}</h1>
+    <p class="article-meta"><time datetime="{{ page.date | date: '%Y-%m-%d' }}">{{ page.date | date: '%Y.%m.%d' }}</time><span aria-hidden="true">·</span> sky070901</p>
+  </header>
+  <div class="article-body">{{ content }}</div>
+  <div class="article-end"><span aria-hidden="true">✳</span><p>읽어주셔서 감사합니다.</p></div>
+</article>

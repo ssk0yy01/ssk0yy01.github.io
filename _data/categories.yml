@@ -1,0 +1,36 @@
+- key: development
+  title: 개발
+  english: DEVELOPMENT
+  description: 만들고 고치며 배운 코드와 개발 과정을 기록합니다.
+  path: /categories/development/
+  number: "01"
+- key: ctf-wargame
+  title: CTF/Wargame
+  english: SECURITY PRACTICE
+  description: 문제를 풀며 익힌 접근법과 풀이 과정을 정리합니다.
+  path: /categories/ctf-wargame/
+  number: "02"
+- key: bug-bounty
+  title: Bug Bounty
+  english: SECURITY RESEARCH
+  description: 취약점 탐구와 책임 있는 분석 기록을 모읍니다.
+  path: /categories/bug-bounty/
+  number: "03"
+- key: blog-docs
+  title: 블로그/기술문서
+  english: WRITING & DOCUMENTATION
+  description: 블로그 운영과 기술 문서 작성 과정을 남깁니다.
+  path: /categories/blog-docs/
+  number: "04"
+- key: papers-conferences
+  title: 논문/컨퍼런스
+  english: RESEARCH & EVENTS
+  description: 읽은 논문과 컨퍼런스에서 얻은 생각을 정리합니다.
+  path: /categories/papers-conferences/
+  number: "05"
+- key: competitions-certificates
+  title: 공모전/자격증
+  english: CHALLENGES & MILESTONES
+  description: 도전한 활동과 준비 과정을 차곡차곡 쌓습니다.
+  path: /categories/competitions-certificates/
+  number: "06"

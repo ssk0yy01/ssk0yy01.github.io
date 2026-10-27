@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101820">
+    <meta name="description" content="{{ page.description | default: site.description | escape }}">
+    <title>{% if page.title %}{{ page.title | escape }} · {% endif %}{{ site.title | escape }}</title>
+    <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+    <header class="site-header">
+      <div class="shell header-inner">
+        <a class="brand" href="{{ '/' | relative_url }}" aria-label="홈으로 이동">
+          <span class="brand-mark" aria-hidden="true">S<span>.</span></span>
+          <span class="brand-name">sky070901<span class="brand-suffix"> / field notes</span></span>
+        </a>
+        <nav class="top-nav" aria-label="주 메뉴">
+          <a href="{{ '/' | relative_url }}#categories">카테고리</a>
+          <a href="{{ '/posts/' | relative_url }}">전체 글</a>
+          <a href="{{ '/about/' | relative_url }}">소개</a>
+          <a class="nav-github" href="https://github.com/sky070901" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+        </nav>
+      </div>
+    </header>
+    <main id="main">{{ content }}</main>
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <div><strong>sky070901 / field notes</strong><p>꾸준히 배우고, 명확히 기록합니다.</p></div>
+        <div class="footer-links"><a href="{{ '/about/' | relative_url }}">소개</a><a href="{{ '/posts/' | relative_url }}">전체 글</a><a href="https://github.com/sky070901" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div>
+      </div>
+    </footer>
+  </body>
+</html>

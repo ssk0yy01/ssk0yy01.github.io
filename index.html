@@ -1,0 +1,23 @@
+---
+layout: default
+---
+<section class="hero">
+  <div class="shell hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="status-dot"></span> LEARNING LOG / 2026—</p>
+      <h1>배운 것을 기록하고,<br><em>다음 시도로</em> 이어갑니다.</h1>
+      <p class="hero-lead">개발과 보안을 공부하며 마주한 문제, 시도한 방법, 새로 알게 된 내용을 한곳에 정리합니다.</p>
+      <div class="hero-actions"><a class="button-primary" href="#categories">기록 둘러보기 <span aria-hidden="true">↗</span></a><a class="button-text" href="{{ '/about/' | relative_url }}">이 블로그 소개 <span aria-hidden="true">→</span></a></div>
+    </div>
+    <div class="hero-visual" aria-hidden="true"><span class="visual-top">/ FIELD NOTES</span><div class="visual-orbit"><div class="orbit-one"></div><div class="orbit-two"></div><div class="orbit-core">S<span>.</span></div></div><span class="visual-bottom">OBSERVE <i>→</i> BUILD <i>→</i> RECORD</span></div>
+  </div>
+</section>
+<section id="categories" class="shell categories-section">
+  <div class="section-intro"><div><p class="eyebrow">EXPLORE THE NOTES</p><h2>기록의 주제들<span class="accent-period">.</span></h2></div><p>관심사를 여섯 갈래로 나누어<br>배움의 흐름을 따라갑니다.</p></div>
+  <div class="category-grid">
+    {% for category in site.data.categories %}
+    <a class="category-card" href="{{ category.path | relative_url }}"><div class="card-top"><span>{{ category.number }} / {{ category.english }}</span><span class="card-arrow" aria-hidden="true">↗</span></div><div><h3>{{ category.title }}</h3><p>{{ category.description }}</p></div></a>
+    {% endfor %}
+  </div>
+</section>
+<section class="recent-band"><div class="shell recent-inner"><div class="section-intro"><div><p class="eyebrow">RECENT WRITING</p><h2>최근 기록<span class="accent-period">.</span></h2></div><a class="view-all" href="{{ '/posts/' | relative_url }}">모든 글 보기 <span aria-hidden="true">↗</span></a></div><div class="post-list">{% for post in site.posts limit: 3 %}{% include post-row.html post=post %}{% endfor %}</div></div></section>
