@@ -1,10 +1,10 @@
 ---
 layout: post
-title: "첫 번째 공부 기록"
+title: "NPKI 인증정보 탈취 악성코드 분석"
 description: "오늘 공부한 내용 정리"
 date: 2026-10-28 10:00:00 +0900
 categories: [blog-docs]
-topic: ai
+topic: 리버싱
 ---
 
 ## 오늘 공부한 내용
