@@ -2,7 +2,7 @@
 layout: post
 title: "첫 번째 공부 기록"
 description: "오늘 공부한 내용 정리"
-date: 2026-10-29 00:00:00 +0900
+date: 2026-10-28 10:00:00 +0900
 categories: [blog-docs]
 topic: ai
 ---
