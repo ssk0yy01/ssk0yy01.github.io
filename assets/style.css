@@ -158,6 +158,9 @@ a.credential-card:hover .credential-copy strong { color: #773bd8; }
 .article-body a { color: #773bd8; text-underline-offset: 4px; }
 .article-body a:hover { text-decoration: underline; }
 .article-body img { max-width: 100%; height: auto; border-radius: 10px; }
+.analysis-figure { margin: 26px 0; }
+.analysis-figure img { display: block; border: 1px solid var(--line); }
+.analysis-figure figcaption { margin-top: 8px; color: var(--muted); font-size: 13px; }
 .article-body p { margin: 16px 0; }
 .article-body blockquote { margin: 24px 0; padding: 4px 18px; border-left: 3px solid #bb97f7; background: #f2ece8; color: #746b63; }
 code, pre { font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 13px; }
