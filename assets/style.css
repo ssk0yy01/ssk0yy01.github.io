@@ -148,7 +148,7 @@ a.credential-card:hover .credential-copy strong { color: #773bd8; }
 .credential-copy strong { font-size: 15px; font-weight: 600; }
 .credential-copy > span { font-size: 14px; color: #827a71; }
 .credential-arrow { color: #aaa198; }
-.article-wrap { padding-top: 34px; max-width: 780px; }
+.article-wrap { width: calc(100% - 48px); padding-top: 34px; max-width: none; }
 .article-head { margin-bottom: 36px; }
 .article-meta { color: #888078; display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; }
 .article-meta time { font-size: 14px; }
