@@ -9,13 +9,14 @@ topic: reversing
 
 이 글은 **2026년 10월 28일 SecurityFirst 동아리 활동에서 발표한 세미나 PPT**를 블로그 형식으로 정리한 글이다.
 
-블로그를 처음 만들고 어떤 내용을 첫 글로 남길지 고민하다가, 이번에 발표한 NPKI 인증정보 탈취 악성코드 분석 과정을 옮겨 보기로 하였다.
-실행 파일의 기본 정보부터 확인하고, 실행 중 발생한 변화와 내부 코드의 동작을 연결하는 순서로 분석하였다.
+블로그를 처음 만들고 어떤 내용을 첫 글로 작성할지 고민하다가, 이번에 동아리에서 발표한 내용이 있어 옮기게 되었다.
+먼저 기초 정적 분석으로 파일의 정보를 확인하고, 기초 동적 분석과 고급 정적 분석 순서로 진행하였다.
 
 분석 대상은 원본 EXE와 그 안에 포함된 **64to32.dll**이다.
-원본 EXE가 DLL을 설치하고 실행하는 과정, DLL이 추가 파일을 내려받는 과정, NPKI 폴더에서 인증서와 개인키를 수집해 전송하려는 과정을 차례로 살펴본다.
+원본 EXE가 내부 DLL을 어떻게 설치하고 실행하는지 먼저 확인하였다.
+이후 DLL 내부로 들어가 추가 파일 다운로드와 NPKI 인증서·개인키 수집 및 전송 과정을 분석하였다.
 
-> 아래 사진은 발표 자료에 사용한 분석 화면이다. 사진을 누르면 원본 크기로 볼 수 있다. 실제 실행에서 관찰한 결과와 정적 분석으로 확인한 코드는 구분해서 설명하였다.
+> 분석 화면의 글씨가 잘 보이지 않으면 사진을 눌러 원본 크기로 볼 수 있다.
 
 ## 목차
 
@@ -38,15 +39,21 @@ topic: reversing
 | Wireshark | HTTP 요청 경로와 반복 통신 |
 | IDA | 언패킹한 EXE와 DLL의 함수 호출 및 분기 흐름 |
 
-PEStudio는 의심스러운 항목을 빠르게 찾는 데 사용하였다.
-다만 표시된 API나 문자열만으로 실제 악성 행위를 확정할 수는 없기 때문에, 이후 동적 분석과 IDA 분석에서 해당 기능이 어떻게 연결되는지 확인하였다.
+**PEStudio**는 파일의 문자열, API 함수, 해시 및 기본 정보를 한눈에 보기 쉽다.
+의심스럽거나 추가 확인이 필요한 항목을 강조해주어 기초 정적 분석에 사용하였다.
+
+**SysAnalyzer**는 악성코드를 실제로 실행한 뒤 시스템에 생기는 변화를 모아서 보여준다.
+프로세스 생성 및 종료, 네트워크 통신, 호출된 API 등을 확인할 수 있어 기초 동적 분석에 사용하였다.
+
+**IDA**는 파일 내부의 코드와 API 호출 흐름을 따라가며 프로그램이 어떤 방식으로 동작하는지 확인하기 좋다.
+앞서 발견한 문자열과 API가 실제로 어디에서 사용되는지 확인하기 위해 고급 정적 분석에 사용하였다.
 
 <h2 id="static">2. 기초 정적 분석</h2>
 
 ### 2.1. 원본 EXE의 패킹 확인과 언패킹
 
-먼저 원본 EXE를 PEStudio로 열어 기본 정보를 확인하였다.
-화면에서 UPX 관련 정보가 확인되었고, 패킹된 실행 파일이라는 점을 출발점으로 삼았다.
+먼저 악성코드 EXE 파일을 PEStudio에 넣어 기본 정보를 확인해보았다.
+확인한 결과 **UPX로 패킹된 모습**을 볼 수 있었다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-01.png" target="_blank" rel="noopener noreferrer" aria-label="원본 EXE의 기본 정보와 UPX 패킹 표시 — 원본 보기">
@@ -56,9 +63,8 @@ PEStudio는 의심스러운 항목을 빠르게 찾는 데 사용하였다.
 </figure>
 
 
-이후 UPX로 언패킹한 파일을 다시 확인하였다.
-언패킹 결과에는 `Unpacked 1 file`이 표시되어 있고, 언패킹한 파일은 `unpacked.exe`라는 이름으로 분석하였다.
-아래 두 화면은 언패킹 결과와 그 파일을 PEStudio에서 다시 연 모습이다.
+파일 내부를 더 확인하기 위해 UPX로 언패킹을 진행하였다.
+`Unpacked 1 file`이 표시된 것을 확인한 뒤, 생성된 `unpacked.exe`를 다시 PEStudio에 넣어보았다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-02.png" target="_blank" rel="noopener noreferrer" aria-label="UPX 언패킹 결과 — 원본 보기">
@@ -77,13 +83,13 @@ PEStudio는 의심스러운 항목을 빠르게 찾는 데 사용하였다.
 
 패킹은 실행 파일의 코드나 데이터를 압축·변형해 저장하고, 실행할 때 다시 사용할 수 있도록 하는 방식이다.
 따라서 패킹된 파일에서 보이는 문자열과 Import 목록만으로 원래 프로그램의 기능 전체를 판단하기는 어렵다.
-**언패킹한 EXE와 내부에서 추출한 DLL을 나눠 분석해야 하는 이유**가 여기에 있다.
+따라서 먼저 언패킹한 EXE를 확인하고, **내부에 포함된 DLL도 추출하여 따로 분석**하였다.
 또한 UPX를 사용했다는 사실 자체가 악성 여부를 결정하지는 않는다.
 
 ### 2.2. Indicators와 가져오는 DLL
 
-Indicators에서는 레지스트리 변경, 서비스 관리, 내부 실행 파일 포함, IP 주소 문자열, 프로세스 관련 기능 등이 표시되었다.
-의심 문자열도 235개가 표시되어 있어, 어떤 문자열과 API 때문에 이런 결과가 나왔는지 더 살펴보았다.
+Indicators 탭을 확인해본 결과 레지스트리 변경, 서비스 관리, 내부 실행 파일 포함, IP 주소 문자열, 프로세스 관련 기능 등의 의심스러운 항목이 표시되었다.
+의심 문자열도 235개가 탐지되어, 이어서 DLL 목록과 API, 문자열을 확인해보았다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-04.png" target="_blank" rel="noopener noreferrer" aria-label="언패킹한 EXE의 Indicators 목록 — 원본 보기">
@@ -93,8 +99,9 @@ Indicators에서는 레지스트리 변경, 서비스 관리, 내부 실행 파�
 </figure>
 
 
-가져오는 DLL 중에서는 `advapi32.dll`과 `shell32.dll`에 주목하였다.
-`advapi32.dll`은 레지스트리·서비스 관련 API와 연결되고, `shell32.dll`은 프로그램 실행과 같은 동작을 살펴볼 단서가 된다.
+DLL 목록에서는 `advapi32.dll`과 `shell32.dll`을 확인할 수 있었다.
+`advapi32.dll`은 레지스트리·서비스·암호화 관련 기능을, `shell32.dll`은 프로그램 실행 등 운영체제의 명령 실행 관련 기능을 제공한다.
+특히 `advapi32.dll`은 아까 Indicators 탭에서 확인한 레지스트리 변경 및 서비스 관리 항목과 연결해서 볼 수 있다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-05.png" target="_blank" rel="noopener noreferrer" aria-label="EXE에서 사용하는 DLL 목록 — 원본 보기">
@@ -106,11 +113,12 @@ Indicators에서는 레지스트리 변경, 서비스 관리, 내부 실행 파�
 
 여기서 **Indicators는 실제 실행 기록이 아니라 추가 확인이 필요한 단서**이다.
 예를 들어 서비스 관련 API가 있으면 서비스 관리 기능을 의심할 수 있지만, 어떤 서비스 이름과 경로를 전달하는지까지 확인해야 구체적인 역할을 알 수 있다.
-그래서 기초 정적 분석에서는 확인할 항목을 정리하고, 이후 API의 인자와 호출 흐름을 따라갔다.
+이후 해당 API에 어떤 값이 전달되는지 확인하기 위해 호출 흐름을 따라가보았다.
 
 ### 2.3. API로 예상한 동작
 
-API 목록에는 리소스 접근, 파일 기록, 서비스 생성, 레지스트리 설정과 관련된 함수들이 함께 나타났다.
+API를 확인해본 결과 내부 리소스 접근, 파일 기록, 서비스 생성, 레지스트리 설정 등 여러 기능을 확인할 수 있었다.
+주요 API의 역할을 정리하면 아래와 같다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-06.png" target="_blank" rel="noopener noreferrer" aria-label="EXE의 Import API 목록 — 원본 보기">
@@ -129,8 +137,8 @@ API 목록에는 리소스 접근, 파일 기록, 서비스 생성, 레지스트
 | `ShellExecuteA` | 다른 프로그램이나 명령 실행 |
 | `LoadLibraryA`, `GetProcAddress` | DLL 로드와 함수 주소 획득 |
 
-이 조합을 보고 **내부에 들어 있는 파일을 디스크에 저장한 뒤, 서비스로 등록해 실행하는 구조**일 가능성을 생각하였다.
-이 단계에서는 동작을 확인한 것이 아니라, 이후 분석할 방향을 잡은 것이다.
+이를 조합해보면 **내부에 포함된 파일을 저장한 뒤 서비스로 등록해 실행할 가능성**을 예상해볼 수 있다.
+실제로 이 동작을 수행하는지는 이후 동적 분석과 IDA에서 확인하였다.
 
 이때 **API 이름의 존재, 실제 호출, 호출 결과는 서로 다른 근거**이다.
 `WriteFile`이 목록에 있다는 것만으로 어떤 파일을 생성하는지 알 수는 없다.
@@ -138,7 +146,7 @@ API 목록에는 리소스 접근, 파일 기록, 서비스 생성, 레지스트
 
 ### 2.4. 문자열에서 확인한 단서
 
-문자열 목록에서는 서비스, 네트워크, 보안 프로그램, 인증서 파일과 관련된 이름을 확인하였다.
+추가로 문자열을 확인해보니 서비스, 네트워크, 보안 프로그램 이름, 인증서 및 개인키 파일과 관련된 문자열을 볼 수 있었다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-07.png" target="_blank" rel="noopener noreferrer" aria-label="EXE 내부 문자열 목록 — 원본 보기">
@@ -160,8 +168,8 @@ IP 주소 문자열이 있다는 사실만으로 해당 주소를 정보 탈취 
 
 ### 2.5. 내부 리소스에서 DLL 추출
 
-Resources 탭에는 **타입 DLL, ID 101, 크기 69,632바이트**인 리소스가 있었다.
-실행 파일 안에 별도 파일이 포함되어 있다는 단서이다.
+Resources 탭을 확인한 결과 **타입 DLL, ID 101, 크기 69,632바이트**인 리소스가 존재하였다.
+즉, 원본 EXE의 리소스 영역 내부에 또 다른 파일이 포함되어 있는 것을 확인할 수 있다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-08.png" target="_blank" rel="noopener noreferrer" aria-label="EXE에 포함된 DLL 리소스 — 원본 보기">
@@ -181,8 +189,8 @@ Resource Hacker로 해당 리소스를 별도 파일로 추출하였다.
 </figure>
 
 
-추출한 파일을 PEStudio에서 확인하니 32비트 DLL이었다.
-Indicators에는 레지스트리, 서비스, 네트워크, 암호화, 프로세스 관련 항목이 표시되었다.
+추출한 파일을 다시 PEStudio에 넣어 확인해본 결과 **32비트 DLL**인 것을 확인할 수 있었다.
+이 파일에서도 레지스트리, 서비스, 네트워크, 암호화, 프로세스 관련 항목이 의심스러운 부분으로 표시되었다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-10.png" target="_blank" rel="noopener noreferrer" aria-label="추출한 DLL의 PEStudio 분석 화면 — 원본 보기">
@@ -199,7 +207,7 @@ Resource Hacker에서 추출한 것은 그 영역에 들어 있던 데이터이�
 ### 2.6. 추출한 DLL의 통신 관련 기능
 
 DLL 목록에는 `wininet.dll`, `ws2_32.dll`, `netapi32.dll`, `crypt32.dll`이 포함되어 있었다.
-원본 EXE를 볼 때보다 네트워크와 관련된 기능이 눈에 띄었다.
+원본 EXE와 비교해보니 네트워크 관련 DLL들이 더 많이 보이는 것을 확인할 수 있었다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-11.png" target="_blank" rel="noopener noreferrer" aria-label="추출한 DLL의 라이브러리 목록 — 원본 보기">
@@ -265,13 +273,14 @@ API 목록에서도 서비스·레지스트리 관리와 함께 HTTP 요청, 메
 `CreateFileMapping`과 `MapViewOfFile`은 파일 내용을 프로세스의 메모리 주소를 통해 접근할 수 있게 하는 기능과 연결된다.
 `UnmapViewOfFile`은 그 매핑된 메모리 영역을 해제한다.
 또한 `Process32First`와 `Process32Next`는 **프로세스 목록을 조회**하는 함수이고, `CreateThread`와 `TerminateThread`는 각각 **스레드 생성과 종료**에 해당한다.
-이름이 함께 나온다는 이유로 같은 역할로 묶지 않고 구분해서 정리하였다.
+각 함수가 하는 역할을 나누어 보면 프로세스 조회, 스레드 처리, 파일 매핑 기능을 따로 확인할 수 있다.
 
 <h2 id="dynamic">3. 기초 동적 분석</h2>
 
 ### 3.1. 뮤텍스와 DLL 파일 생성
 
-SysAnalyzer의 API 호출 로그에서 `system32t`라는 이름의 뮤텍스 생성·열기 관련 동작을 확인하였다.
+먼저 SysAnalyzer의 API 호출 로그를 확인해보았다.
+로그에서 **`system32t`라는 이름의 뮤텍스 생성·열기**를 확인할 수 있었다.
 `C:\WINDOWS\system32\64to32.dll` 생성과 관련된 흔적도 확인하였다.
 
 `DeleteFileW` 호출은 파일 삭제를 시도하는 단서였지만, 이 호출만으로 원본 EXE가 실제로 삭제되었다고 단정하지는 않았다.
@@ -285,7 +294,8 @@ SysAnalyzer의 API 호출 로그에서 `system32t`라는 이름의 뮤텍스 생
 </figure>
 
 
-Directory Watch Data에서도 시스템 디렉터리에 새 DLL이 생성된 것을 확인하였다.
+이어서 Directory Watch Data 탭에서 디렉터리의 변경을 관찰해보았다.
+확인한 결과 시스템 디렉터리에 새로운 `64to32.dll`이 생성된 것을 볼 수 있었다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-16.png" target="_blank" rel="noopener noreferrer" aria-label="Directory Watch Data의 파일 변경 기록 — 원본 보기">
@@ -303,8 +313,8 @@ Directory Watch Data에서도 시스템 디렉터리에 새 DLL이 생성된 것
 
 ### 3.2. 생성된 DLL과 리소스에서 추출한 DLL 비교
 
-생성된 `64to32.dll`의 크기는 리소스에서 추출한 DLL과 같은 **69,632바이트**였다.
-크기만 같다고 동일한 파일이라고 판단할 수는 없으므로 해시를 비교하였다.
+생성된 `64to32.dll`을 확인해보니 아까 Resource Hacker로 분리한 DLL과 크기가 **69,632바이트**로 같았다.
+더 확실하게 확인해보기 위해 두 파일의 해시 값을 대조하였다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-17.png" target="_blank" rel="noopener noreferrer" aria-label="생성된 64to32.dll의 파일 속성 — 원본 보기">
@@ -328,17 +338,17 @@ Directory Watch Data에서도 시스템 디렉터리에 새 DLL이 생성된 것
 </figure>
 
 
-비교 결과 **MD5와 SHA-1이 모두 일치**하였다.
-이를 통해 EXE 내부에 포함되어 있던 DLL이 실행 과정에서 `64to32.dll`로 저장되었다는 점을 확인하였다.
+대조해본 결과 **MD5와 SHA-1이 모두 같다는 것**을 확인할 수 있었다.
+따라서 원본 EXE 내부에 있던 DLL이 실행 후 `64to32.dll`로 저장된 것으로 판단된다.
 
 파일 크기는 내용이 달라도 같을 수 있으므로 크기 비교만으로는 근거가 부족하다.
 해시는 **파일의 내용을 입력으로 계산한 값**이므로, 같은 방식으로 비교하면 내용의 일치 여부를 판단하는 데 도움이 된다.
-이번에는 동일한 실행 전후 자료에서 파일 크기와 두 해시를 함께 대조하여 내부 DLL과 생성된 DLL의 연결 근거로 사용하였다.
+이번 분석에서는 파일 크기와 두 해시 값이 모두 일치하는 것을 확인하여, 추출한 DLL과 생성된 DLL을 비교하였다.
 
 ### 3.3. 서비스 등록과 svchost.exe 실행
 
-SysAnalyzer의 Services 탭에서는 `64to32` 서비스가 확인되었고, Running Processes에서는 해당 서비스와 연결된 `svchost.exe`를 확인하였다.
-당시 분석 환경에서의 PID는 `3540`이었다.
+추가로 Services 탭에서 `64to32` 서비스가 등록된 것을 확인할 수 있었다.
+Running Processes 탭에서는 **PID `3540`인 `svchost.exe`에서 `64to32.dll`이 실행 중**인 것을 확인하였다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-20.png" target="_blank" rel="noopener noreferrer" aria-label="SysAnalyzer에서 확인한 64to32 서비스 — 원본 보기">
@@ -355,9 +365,9 @@ SysAnalyzer의 Services 탭에서는 `64to32` 서비스가 확인되었고, Runn
 </figure>
 
 
-Process Explorer에서도 같은 PID의 프로세스를 찾아 속성을 확인하였다.
-서비스 정보에 `64to32`와 DLL 경로가 나타났다.
-이 PID는 해당 실행 당시의 값이다.
+더 확인해보기 위해 Process Explorer에서 PID `3540`인 `svchost.exe`를 찾아 속성에 들어가보았다.
+서비스 정보에서도 `64to32`와 DLL 경로를 확인할 수 있었다.
+PID `3540`은 이번 실행에서 부여된 번호이므로, 다시 실행하면 달라질 수 있다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-22.png" target="_blank" rel="noopener noreferrer" aria-label="Process Explorer의 svchost.exe 확인 — 원본 보기">
@@ -377,11 +387,12 @@ Process Explorer에서도 같은 PID의 프로세스를 찾아 속성을 확인�
 `64to32`는 **서비스 이름**, `64to32.dll`은 **서비스에서 사용하는 DLL 파일**, `svchost.exe`는 **그 서비스를 실행하는 호스트 프로세스**이다.
 세 이름은 같은 대상을 서로 다르게 부른 것이 아니라 각각 다른 역할을 한다.
 따라서 Services 탭의 서비스 이름, 실행 프로세스의 PID, Process Explorer의 DLL 정보와 레지스트리 경로를 연결해서 확인하였다.
-**`svchost.exe`라는 프로세스 이름만 보고 정상 또는 악성으로 판단하지 않은 이유**도 여기에 있다.
+따라서 **`svchost.exe`라는 이름만 보기보다 어떤 서비스와 DLL이 연결되어 있는지** 확인할 필요가 있다.
 
 ### 3.4. 서비스 레지스트리 설정
 
-레지스트리 편집기에서는 서비스가 `svchost.exe`를 통해 실행되도록 설정되어 있고, 계정은 `LocalSystem`, `Start` 값은 `2`인 것을 확인하였다.
+다음으로 Regedit에서 `64to32` 서비스의 등록 설정을 확인해보았다.
+확인한 결과 `svchost.exe`에서 `LocalSystem` 계정으로 실행되도록 설정되어 있고, `Start` 값은 `2`인 것을 볼 수 있었다.
 `Start = 2`는 Windows 시작 시 자동으로 실행되도록 설정된 상태를 뜻한다.
 
 <figure class="analysis-figure">
@@ -407,12 +418,12 @@ Process Explorer에서도 같은 PID의 프로세스를 찾아 속성을 확인�
 관리자 권한으로 프로그램을 실행하는 것과 동일한 개념은 아니며, 모든 접근 제한을 무조건 우회한다는 뜻도 아니다.
 여기서는 **서비스가 어떤 계정으로 실행되도록 설정되었는지**를 확인하는 항목이다.
 
-또한 **자동 시작 설정과 재부팅 후 실행 성공은 구분해야 한다.**
-`Start = 2`는 자동 시작하도록 구성되었다는 근거이고, 재부팅 후 실제 실행 여부를 확인한 기록은 이 분석 자료에 포함되어 있지 않다.
+**`Start = 2`로 자동 시작 설정은 확인할 수 있었다.**
+다만 재부팅 후에도 실제로 실행되는지는 추가 확인이 필요하다.
 
 ### 3.5. 반복되는 HTTP GET 요청
 
-`http.log`에서는 `/main/m0913.txt`를 요청하는 기록을 확인하였다.
+추가로 `http.log`를 확인해보니 **`/main/m0913.txt`를 요청하는 모습**을 볼 수 있었다.
 요청의 Host는 `csv[.]sr5yr[.]com`, User-Agent는 `Alerter COM+`로 표시되어 있었다.
 
 <figure class="analysis-figure">
@@ -434,11 +445,12 @@ Wireshark에서는 `/main/m0913.txt`와 `/main/main0913.txt`를 HTTP GET으로 �
 </figure>
 
 
-**응답 화면의 Server 헤더는 `INetSim HTTP Server`이다.** 따라서 이 화면은 분석 환경에서 요청과 모의 응답이 관찰된 근거로 해석해야 한다.
-실제 외부 서버로부터 명령을 받았다거나 인증정보 전송까지 성공했다는 근거는 아니다.
+응답을 더 확인해보니 **Server 헤더에 `INetSim HTTP Server`가 표시**되어 있었다.
+따라서 여기서 받은 것은 분석 환경의 모의 응답이며, 실제 외부 서버의 명령을 받았다고 판단할 수는 없다.
 
-동적 분석에서 확인한 핵심은 내부 DLL과 같은 해시의 파일이 생성되고, 서비스로 등록되어 `svchost.exe`에서 실행되며, 두 텍스트 파일 경로로 요청을 반복한다는 점이다.
-이어서 EXE와 DLL의 코드에서 각각의 역할을 확인하였다.
+기초 동적 분석 결과, 추출한 DLL과 해시가 같은 `64to32.dll`이 생성되고 서비스로 등록되어 `svchost.exe`에서 실행되는 것을 확인하였다.
+또한 두 텍스트 파일 경로를 HTTP GET으로 반복 요청하는 모습을 볼 수 있었다.
+이어서 원본 EXE와 `64to32.dll`의 구체적인 역할을 확인하기 위해 고급 정적 분석을 진행하였다.
 
 HTTP 로그의 각 항목은 다음처럼 구분할 수 있다.
 
@@ -454,17 +466,19 @@ HTTP 로그의 각 항목은 다음처럼 구분할 수 있다.
 
 INetSim은 HTTP·DNS 등의 서비스를 흉내 내어 분석 대상의 통신 요청에 응답하는 도구이다.
 그래서 위 기록은 **요청과 모의 응답을 확인한 근거**이고, 실제 서버에 있던 텍스트 파일의 내용을 확보한 근거는 아니다.
-또한 Wireshark에서 GET 요청만 보이는 화면을 보고 응답이 없었다고 판단하지 않았다.
-요청과 응답을 함께 확인해야 전체 통신 흐름을 설명할 수 있다.
+Wireshark에서 GET 요청만 보이는 화면도 있었지만, HTTP 로그에서는 응답을 확인할 수 있었다.
+따라서 요청과 응답을 함께 확인하였다.
 
 <h2 id="exe">4. 고급 정적 분석 — EXE</h2>
 
 ### 4.1. start에서 WinMain으로 이동
 
-언패킹한 EXE의 진입점인 `start`부터 확인하였다.
-실행 환경과 명령줄 정보를 준비한 뒤 `WinMain`을 호출하는 흐름이어서, 주요 동작은 `WinMain`을 중심으로 따라갔다.
+먼저 언패킹한 EXE의 진입점인 `start` 함수부터 확인해보았다.
+이 부분에서는 실행 환경과 명령줄 정보를 준비한 뒤 `WinMain`을 호출한다.
+따라서 주요 동작을 확인하기 위해 `WinMain`으로 이동하여 분석을 진행하였다.
 
-`WinMain`은 먼저 `sub_401000`에 **`system32t` 문자열의 주소를 전달한다.** 동적 분석에서 확인한 뮤텍스 이름과 같은 문자열이다.
+`WinMain`에서는 먼저 `sub_401000`에 **`system32t` 문자열의 주소를 전달한다.**
+아까 기초 동적 분석에서 같은 이름의 뮤텍스를 확인했으므로, 해당 함수 내부로 들어가 뮤텍스 처리 과정을 확인해보았다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-28.png" target="_blank" rel="noopener noreferrer" aria-label="WinMain에서 system32t를 전달하는 부분 — 원본 보기">
@@ -480,8 +494,9 @@ IDA에서 보이는 `push offset aSystem32t`는 `system32t`라는 문자열의 �
 
 ### 4.2. 뮤텍스 관련 API를 동적으로 호출
 
-`sub_401000`에서는 `LoadLibraryA`로 `kernel32.dll`을 불러오고, `GetProcAddress`로 `CreateMutexA`의 주소를 가져온다.
-얻은 주소를 `[ebp+var_4]`에 저장한 뒤 간접 호출한다.
+`sub_401000`에 들어가보니 먼저 `LoadLibraryA`로 `kernel32.dll`을 불러온다.
+그 후 `GetProcAddress`에 모듈 핸들과 `CreateMutexA`라는 함수 이름을 전달한다.
+반환된 **`CreateMutexA` 함수 주소를 `[ebp+var_4]`에 저장**한 뒤, 이 주소를 이용해 함수를 호출한다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-29.png" target="_blank" rel="noopener noreferrer" aria-label="CreateMutexA 함수 주소 획득 — 원본 보기">
@@ -498,8 +513,8 @@ IDA에서 보이는 `push offset aSystem32t`는 `system32t`라는 문자열의 �
 </figure>
 
 
-이 코드는 `system32t` 뮤텍스와 관련된 동적 분석 결과를 설명해 준다.
-같은 이름의 뮤텍스가 없다면 새로 생성하는 동작이다.
+앞서 저장한 `CreateMutexA`를 호출하면 같은 이름의 뮤텍스가 없을 경우 새로 생성한다.
+기초 동적 분석에서 확인한 `system32t` 뮤텍스가 이 부분과 연결되는 것을 볼 수 있다.
 
 이 호출은 다음 세 단계로 나눠 읽을 수 있다.
 
@@ -518,8 +533,9 @@ IDA에서 보이는 `push offset aSystem32t`는 `system32t`라는 문자열의 �
 
 ### 4.3. 메시지 처리와 작업 함수 호출
 
-다음으로 `user32.dll`에서 `PostThreadMessageA`, `GetInputState`, `GetMessageA`의 주소를 가져온다.
-`GetInputState`로 입력 상태를 확인하고, 현재 스레드의 메시지 큐에 `WM_NULL(0)`을 넣는 과정이 이어진다.
+뮤텍스 처리를 마친 뒤 `WinMain`으로 돌아와 다음으로 사용할 함수들을 확인해보았다.
+`user32.dll`에서 `PostThreadMessageA`, `GetInputState`, `GetMessageA`의 주소를 가져와 저장한다.
+이어서 `GetInputState`로 키보드나 마우스 버튼 입력이 있는지 확인하고, `PostThreadMessageA`로 현재 스레드의 메시지 대기열에 `WM_NULL(0)`을 넣는다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-31.png" target="_blank" rel="noopener noreferrer" aria-label="PostThreadMessageA와 GetInputState 주소 획득 — 원본 보기">
@@ -564,7 +580,7 @@ IDA에서 보이는 `push offset aSystem32t`는 `system32t`라는 문자열의 �
 
 ### 4.4. 보안 제품 관련 프로세스 조회
 
-`sub_4037A0`은 `V3LTray.exe`, `AYAgent.aye`, `nsavsvc.npc`, `v3sp.EXE` 등의 이름을 `sub_401070`에 전달한다.
+먼저 `sub_4037A0`에 들어가보니 `V3LTray.exe`, `AYAgent.aye`, `nsavsvc.npc`, `v3sp.EXE` 등의 프로세스 이름을 `sub_401070`에 차례대로 전달하고 있었다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-35.png" target="_blank" rel="noopener noreferrer" aria-label="보안 제품 관련 프로세스 이름 전달 — 원본 보기">
@@ -575,7 +591,8 @@ IDA에서 보이는 `push offset aSystem32t`는 `system32t`라는 문자열의 �
 
 
 `sub_401070`은 실행 중인 프로세스 이름을 전달받은 문자열과 비교해 해당 프로세스가 실행 중인지 확인한다.
-여기서 확인한 내용은 프로세스의 **조회와 비교**이며, 이 화면만으로 보안 프로그램을 종료하거나 무력화한다고 단정하지는 않았다.
+여기까지는 해당 프로세스가 실행 중인지 **조회하고 이름을 비교하는 부분**을 확인하였다.
+프로세스를 종료하거나 무력화하는지에 대해서는 추가 확인이 필요하다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-36.png" target="_blank" rel="noopener noreferrer" aria-label="실행 중인 프로세스 이름 비교 — 원본 보기">
@@ -592,7 +609,8 @@ IDA에서 보이는 `push offset aSystem32t`는 `system32t`라는 문자열의 �
 
 ### 4.5. 레지스트리 API 준비
 
-`sub_4013C0`에서는 `ADVAPI32.dll`에서 **레지스트리 처리에 사용할 API 주소를 가져온다.** 아래 사진에서 직접 확인할 수 있는 범위는 함수 이름을 전달하고 주소를 준비하는 부분이다.
+다음으로 `sub_4013C0`을 확인해보았다.
+아래 화면에서는 `ADVAPI32.dll`에서 **레지스트리 처리에 사용할 API 주소를 가져오는 모습**을 볼 수 있다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-37.png" target="_blank" rel="noopener noreferrer" aria-label="레지스트리 API의 동적 로드 — 원본 보기">
@@ -609,7 +627,7 @@ IDA에서 보이는 `push offset aSystem32t`는 `system32t`라는 문자열의 �
 
 ### 4.6. 64to32 서비스와 DLL 경로 설정
 
-`sub_4032F0`에서는 서비스 설치에 필요한 경로와 설정을 준비한다.
+이어서 `sub_4032F0`에 들어가보니 서비스 설치에 필요한 경로와 설정값을 구성하고 있었다.
 먼저 `OpenSCManagerA`에 두 개의 `NULL`을 전달해 현재 컴퓨터의 기본 서비스 데이터베이스에 연결을 요청하고, 접근 권한으로 `0xF003F`를 요청한다.
 
 이어서 `GetSystemDirectoryA`로 시스템 디렉터리 경로를 가져오고, `wsprintfA`로 시스템 경로와 `64to32`를 결합한다.
@@ -634,8 +652,9 @@ IDA에서 보이는 `push offset aSystem32t`는 `system32t`라는 문자열의 �
 </figure>
 
 
-그 다음 **`HKEY_LOCAL_MACHINE`, `Parameters` 경로, `ServiceDll`, 앞서 만든 DLL 경로를 인자로 준비한다.** 이 호출부만으로 하위 함수 내부의 쓰기 처리를 모두 확인한 것은 아니다.
-실제 레지스트리에 DLL 경로가 기록된 사실은 앞의 동적 분석 화면에서 확인하였다.
+그 후 **`HKEY_LOCAL_MACHINE`, `Parameters` 경로, `ServiceDll`, 앞서 만든 DLL 경로를 인자로 전달할 준비**를 한다.
+전달하는 DLL 경로는 기초 동적 분석에서 확인한 `ServiceDll` 값과 일치한다.
+다만 아래 화면은 호출할 때 전달하는 값까지 보여주므로, 실제 쓰기 처리는 하위 함수 내부에서 추가로 확인할 필요가 있다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-40.png" target="_blank" rel="noopener noreferrer" aria-label="ServiceDll 값 설정 — 원본 보기">
@@ -660,7 +679,8 @@ IDA에서 보이는 `push offset aSystem32t`는 `system32t`라는 문자열의 �
 
 ### 4.7. 다른 고정 드라이브를 탐색하는 스레드
 
-서비스 설정 이후에는 `CreateThread`의 시작 함수인 `StartAddress`를 확인하였다.
+여기까지 서비스 등록과 DLL 경로 설정 흐름을 확인하였다.
+이후 `WinMain`으로 돌아와 `CreateThread`의 시작 함수로 지정된 `StartAddress` 내부에 들어가보았다.
 드라이브 목록에서 드라이브 문자와 콜론을 복사하고, `GetDriveTypeA`의 결과를 `3`과 비교한다.
 고정 드라이브가 아니면 해당 대상을 건너뛴다.
 
@@ -683,19 +703,20 @@ IDA에서 보이는 `push offset aSystem32t`는 `system32t`라는 문자열의 �
 </figure>
 
 
-발표에서 정리한 하위 탐색 흐름은 다음과 같다.
+`StartAddress`와 하위 함수의 동작을 정리하면 아래와 같다.
 시스템 드라이브를 제외한 고정 드라이브에서 파일과 하위 폴더를 탐색하고, 파일 이름이 비교 조건에 맞으면 기존 파일의 이동·삭제를 시도한다.
 이어서 `64to32.dll`을 복사하고 숨김 속성을 설정하려는 코드가 있다.
 
-이 부분은 **다른 고정 드라이브에 DLL을 복사하려는 기능**으로 해석하였다.
-실제 복사가 성공했는지는 발표 자료의 동적 분석 결과로 확인하지 못하였다.
+따라서 **시스템 드라이브를 제외한 다른 고정 드라이브에 DLL을 복사하려는 동작**으로 판단된다.
+실제 복사 성공 여부는 추가 확인이 필요하다.
 
 고정 드라이브는 일반적으로 컴퓨터에 연결된 HDD·SSD의 드라이브를 뜻하며, 이 코드에서는 `GetDriveTypeA`의 반환값 **`3`**으로 구분한다.
 `StrStrIA`는 문자열 안에 다른 문자열이 포함되는지 대소문자를 구분하지 않고 찾는다.
 예를 들어 시스템 경로가 `C:\WINDOWS\system32`이면 그 안의 `C:`를 찾는 방식으로 시스템 드라이브를 제외한다.
 
 또한 탐색기에서 DLL이 보였다는 것만으로 숨김 속성 설정의 성공·실패를 판단할 수는 없다.
-숨김 파일 표시 옵션에 따라 화면에 보일 수 있으므로, 여기서는 **복사 및 숨김 속성 설정을 시도하는 코드**로 설명하였다.
+숨김 파일 표시 옵션이 켜져 있으면 숨김 속성이 있어도 보일 수 있다.
+따라서 **복사와 숨김 속성 설정을 시도하는 코드**를 확인한 뒤, 실제 파일의 속성도 따로 확인할 필요가 있다.
 
 ### 4.8. 스레드 대기와 핸들 정리
 
@@ -726,7 +747,8 @@ IDA에서 보이는 `push offset aSystem32t`는 `system32t`라는 문자열의 �
 
 ### 4.9. 원본 EXE 자기 삭제 시도
 
-`sub_401170`은 `GetModuleFileNameA`로 현재 EXE 경로를 얻고, `GetShortPathNameA`로 짧은 경로 형태로 변환한다.
+마지막으로 호출되는 `sub_401170`의 역할을 확인하기 위해 내부에 들어가보았다.
+먼저 `GetModuleFileNameA`로 현재 EXE의 경로를 가져오고, 이어서 `GetShortPathNameA`로 짧은 경로 형태로 변환한다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-45.png" target="_blank" rel="noopener noreferrer" aria-label="현재 EXE의 경로 획득과 짧은 경로 변환 — 원본 보기">
@@ -780,7 +802,8 @@ DLL 파일 생성과 서비스 실행은 앞서 동적 분석에서 확인한 �
 
 ### 5.1. ServiceMain과 서비스 상태 보고
 
-`64to32.dll`은 원본 EXE에서 추출되어 서비스로 실행되는 DLL이므로 `ServiceMain`부터 살펴보았다.
+다음으로 원본 EXE의 리소스에서 추출한 `64to32.dll`을 분석하였다.
+앞서 서비스로 등록되어 실행되는 것을 확인했으므로, 서비스 실행 흐름을 보기 위해 **`ServiceMain`부터 확인해보았다.**
 먼저 `wcstombs`로 서비스 이름을 변환하고, `RegisterServiceCtrlHandlerA`로 서비스 제어 핸들러를 등록한다.
 
 <figure class="analysis-figure">
@@ -792,7 +815,8 @@ DLL 파일 생성과 서비스 실행은 앞서 동적 분석에서 확인한 �
 
 
 등록에 성공하면 `FreeConsole`로 현재 프로세스와 연결된 콘솔을 분리한다.
-이어서 `sub_10001790`을 두 번 호출하고, `sub_10001670`, `sub_100015E0` 등의 작업으로 넘어갑니다.
+이후 `sub_10001790`을 두 번 호출하고, `sub_10001670`, `sub_100015E0`을 차례로 호출한다.
+먼저 `sub_10001790`의 역할부터 확인해보았다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-49.png" target="_blank" rel="noopener noreferrer" aria-label="서비스 초기화 이후의 호출 흐름 — 원본 보기">
@@ -831,8 +855,8 @@ DLL 파일 생성과 서비스 실행은 앞서 동적 분석에서 확인한 �
 
 ### 5.2. INI 경로와 작업 스레드
 
-다음으로 `GetSystemDirectoryA`와 `wsprintfA`를 사용해 `Windowsxp.ini`, `Windowsxp32.ini`의 전체 경로를 만든다.
-각 경로는 `var_518`과 `pszPath`에 저장된다.
+이어서 `GetSystemDirectoryA`로 시스템 경로를 가져오고, `wsprintfA`로 파일 이름을 결합한다.
+이렇게 만든 `Windowsxp.ini` 경로는 `var_518`에, `Windowsxp32.ini` 경로는 `pszPath`에 저장한다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-52.png" target="_blank" rel="noopener noreferrer" aria-label="두 INI 파일의 경로 구성 — 원본 보기">
@@ -844,7 +868,7 @@ DLL 파일 생성과 서비스 실행은 앞서 동적 분석에서 확인한 �
 
 `_beginthreadex`는 `sub_10003C10`에서 시작하는 작업 스레드를 만든다.
 이어지는 코드에서는 `Windowsxp32.ini` 경로를 `sub_100036E0`에 전달한다.
-이 중 통신과 응답 처리를 맡는 `sub_100036E0`부터 따라갔다.
+먼저 INI 경로를 전달한 `sub_100036E0` 내부로 들어가보았다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-53.png" target="_blank" rel="noopener noreferrer" aria-label="작업 스레드 생성과 INI 경로 전달 — 원본 보기">
@@ -861,11 +885,12 @@ INI는 보통 `[섹션]` 아래에 `항목=값`을 기록하는 설정 파일이
 `_beginthreadex`도 새 스레드를 만드는 함수이지만, C 런타임을 사용하는 스레드에 필요한 준비와 정리를 함께 처리한다.
 “작업 스레드”는 별도의 일을 맡았다는 의미이며 다른 종류의 스레드를 뜻하지 않는다.
 호출하는 쪽에서는 `Windowsxp32.ini` 경로를 먼저 전달하고, 반환값이 `0`이면 `Windowsxp.ini` 경로를 전달하는 흐름을 확인하였다.
-따라서 두 경로를 준비한 부분을 새로 생성한 `sub_10003C10`의 내부라고 혼동하지 않도록 구분하였다.
+두 INI 경로를 전달하는 부분은 호출하는 쪽에서 확인할 수 있으며, 앞서 만든 작업 스레드 `sub_10003C10`과는 따로 따라가보았다.
 
 ### 5.3. WinINet 함수 주소 획득
 
-`sub_100036E0`에서는 `wininet.dll`을 불러온 뒤 `GetProcAddress`로 통신에 사용할 함수 주소를 가져온다.
+`sub_100036E0`에서는 먼저 인터넷 통신에 필요한 `wininet.dll`을 불러온다.
+이어서 `GetProcAddress`로 통신에 사용할 함수 주소를 가져와 저장한다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-54.png" target="_blank" rel="noopener noreferrer" aria-label="wininet.dll 로드 — 원본 보기">
@@ -882,8 +907,8 @@ INI는 보통 `[섹션]` 아래에 `항목=값`을 기록하는 설정 파일이
 </figure>
 
 
-`InternetOpenA`는 통신 환경 초기화, `InternetOpenUrlA`는 URL 열기, `InternetCloseHandle`은 사용한 핸들 정리와 연결된다.
-호출 이름만 보는 데서 그치지 않고, 이후 응답을 어디에 저장하고 어떻게 처리하는지 이어서 확인하였다.
+가져온 함수들을 확인해보면 `InternetOpenA`는 통신 환경을 초기화하고, `InternetOpenUrlA`는 URL을 열며, `InternetCloseHandle`은 사용한 핸들을 닫는 함수이다.
+이후 이 함수들을 어디에서 호출하는지 확인해보았다.
 
 `InternetOpenA`의 초기화는 **WinINet 통신에 사용할 세션과 설정을 준비하고 핸들을 얻는 단계**이다.
 그 핸들을 이용해 `InternetOpenUrlA`가 지정한 URL을 열고, 응답 데이터는 이후 `InternetReadFile`로 읽는다.
@@ -892,9 +917,10 @@ INI는 보통 `[섹션]` 아래에 `항목=값`을 기록하는 설정 파일이
 
 ### 5.4. TIME 값을 검사한 뒤 URL 요청
 
-INI 파일의 `[TIME]` 섹션에서 `TIME` 값을 읽어 `atoi`로 정수로 변환한다.
-기존 `ESI` 값에서 이를 뺀 결과를 `800(0x320)`과 비교해 실행 경로를 결정한다.
-이 비교값의 시간 단위는 제시된 코드 화면만으로 단정하지 않았다.
+통신에 필요한 함수를 준비한 뒤 INI 파일의 `[TIME]` 섹션에서 `TIME` 값을 읽는다.
+읽은 값을 `atoi`로 정수로 바꾸고, 기존 `ESI` 값에서 뺀다.
+그 후 **두 값의 차이를 `800(0x320)`과 비교**하여 다음 실행 경로를 결정한다.
+다만 이 값의 시간 단위는 화면의 코드만으로 확인하기 어려워 추가 확인이 필요하다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-56.png" target="_blank" rel="noopener noreferrer" aria-label="INI의 TIME 값과 비교 조건 — 원본 보기">
@@ -931,7 +957,7 @@ cmp esi, 320h    ; 뺀 결과를 800과 비교한다.
 ```
 
 분석 중 확인한 두 INI의 `TIME` 값은 각각 `1793168679`, `1793168713`이었다.
-이 숫자만으로 정확한 시간 의미를 확정하지 않고, 어떤 값에서 빼고 어느 분기로 이동하는지에 초점을 맞추었다.
+이 값만으로 정확한 시간 의미를 알 수는 없으므로, 우선 코드에서 값을 읽고 계산한 뒤 비교하는 순서를 확인하였다.
 
 응답 버퍼 초기화에서는 다음 명령이 핵심이다.
 
@@ -953,7 +979,8 @@ EAX 값이 이동하는 것이 아니라, 메모리에 값을 기록할 위치�
 
 ### 5.5. BACKTIME과 응답 비교
 
-읽은 응답에서 `strncpy`로 처음 8바이트를 복사하고, `PathFileExistsA`로 INI 파일의 존재 여부를 확인한다.
+앞서 읽은 응답에서 `strncpy`로 처음 8바이트를 복사하여 비교할 데이터를 준비한다.
+그 다음 `PathFileExistsA`로 INI 파일 경로가 존재하는지 확인한다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-59.png" target="_blank" rel="noopener noreferrer" aria-label="응답 앞부분 복사와 INI 파일 확인 — 원본 보기">
@@ -999,8 +1026,8 @@ INI 파일이 있으면 `[TIME]` 섹션의 `BACKTIME` 값을 가져와 `_stricmp
 
 ### 5.6. 응답을 줄 단위로 나누기
 
-검사를 통과한 응답은 `strtok`으로 줄바꿈 기준으로 나눈다.
-이후 반복 호출을 통해 각 항목의 주소를 차례대로 저장한다.
+앞서 검사를 통과한 응답을 `strtok`으로 줄바꿈 기준으로 나눈다.
+이후 `strtok`을 반복 호출하여 나눈 각 항목의 주소를 차례대로 저장한다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-63.png" target="_blank" rel="noopener noreferrer" aria-label="strtok을 통한 응답 분리 시작 — 원본 보기">
@@ -1039,8 +1066,9 @@ INI 파일이 있으면 `[TIME]` 섹션의 `BACKTIME` 값을 가져와 `_stricmp
 
 ### 5.7. 임시 파일 이름과 경로 구성
 
-`sub_10003040`에서는 `GetTempPathA`로 임시 폴더 경로를 가져온다.
-이어서 문자를 선택하는 과정을 반복해 8글자 이름을 만든다.
+앞서 응답 항목을 전달한 `sub_10003040`에 들어가보았다.
+먼저 `GetTempPathA`로 임시 폴더 경로를 가져온다.
+이어서 임의의 문자를 선택하고, `cmp`로 횟수를 확인하며 반복하여 **8글자 이름**을 만든다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-66.png" target="_blank" rel="noopener noreferrer" aria-label="임시 폴더 경로 획득 — 원본 보기">
@@ -1080,12 +1108,16 @@ INI 파일이 있으면 `[TIME]` 섹션의 `BACKTIME` 값을 가져와 `_stricmp
 `cmp esi, 8`은 문자를 8개 만들었는지 확인하는 반복 조건이다.
 
 따라서 여기서 확인한 저장 형식은 **임시 폴더 + 임의의 8글자 이름 + `.pif`**이다.
-이 경로를 만들었다는 사실만으로 파일이 실제 디스크에 생성되었다고 보지는 않았으며, 실제 저장은 다음 다운로드 호출과 결과를 함께 확인해야 한다.
+여기까지는 저장할 경로를 만드는 부분이다.
+이어서 이 경로를 전달받는 다운로드 함수를 확인해보았다.
 
 ### 5.8. 추가 파일 다운로드와 실행 시도
 
-`sub_10002EC0`은 **`sub_10002E90`을 호출해 변형된 DLL 이름과 함수 이름을 복원한다.** 이후 복원한 `urlmon.dll`을 불러오고, `GetProcAddress`로 `URLDownloadToFileA`의 주소를 가져온다.
-아래 사진의 IDA 주석에는 복원 전 문자열이 남아 있으므로, 주석에 보이는 문자열과 실행 시 전달할 문자열을 구분해서 볼 필요가 있다.
+다음으로 `sub_10002EC0`을 확인해보니 **`sub_10002E90`을 호출해 변형된 DLL 이름과 함수 이름을 복원**하고 있었다.
+복원한 DLL 이름을 `LoadLibraryA`에 전달하여 `urlmon.dll`을 불러온다.
+이어서 `GetProcAddress`로 `URLDownloadToFileA`의 주소를 가져온다.
+아래 IDA 화면의 주석에는 복원 전 문자열이 남아 있다.
+실제로 전달되는 이름을 확인하기 위해 앞에서 호출한 문자열 복원 함수도 함께 확인해보았다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-70.png" target="_blank" rel="noopener noreferrer" aria-label="다운로드에 사용할 DLL 로드 — 원본 보기">
@@ -1102,7 +1134,8 @@ INI 파일이 있으면 `[TIME]` 섹션의 `BACKTIME` 값을 가져와 `_stricmp
 </figure>
 
 
-획득한 함수 주소를 호출해 응답 항목의 URL에서 임시 파일 경로로 다운로드를 시도하고, 반환값을 검사한다.
+앞서 가져온 `URLDownloadToFileA`를 호출하여 응답 항목의 URL에서 임시 파일 경로로 다운로드를 시도한다.
+그 후 `test`로 반환값을 검사한다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-72.png" target="_blank" rel="noopener noreferrer" aria-label="다운로드 호출과 결과 검사 — 원본 보기">
@@ -1113,8 +1146,8 @@ INI 파일이 있으면 `[TIME]` 섹션의 `BACKTIME` 값을 가져와 `_stricmp
 
 
 다운로드 함수가 `0`을 반환한 분기에서는 `WinExec`로 임시 파일의 실행을 시도한다.
-제시된 코드에서는 `WinExec`의 실행 성공 여부를 따로 검사하지 않고 `1`을 반환한다.
-따라서 이 부분에서 확인한 것은 **추가 파일 다운로드·실행 기능의 존재**이며, 실제 추가 파일이 성공적으로 실행되었다는 동적 분석 결과는 아니다.
+코드를 더 확인해보니 `WinExec`의 실제 실행 성공 여부는 검사하지 않고 `1`을 반환한다.
+따라서 **추가 파일 다운로드와 실행을 시도하는 코드**는 확인할 수 있었지만, 실제 실행 성공 여부는 추가 확인이 필요하다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-73.png" target="_blank" rel="noopener noreferrer" aria-label="임시 파일의 WinExec 호출 — 원본 보기">
@@ -1151,7 +1184,7 @@ mov [eax], cl   ; 복원한 문자를 저장한다.
 
 ### 5.9. NPKI 폴더 탐색
 
-이제 별도 작업 스레드의 인증서 탐색 과정을 살펴보았다.
+다운로드와 실행 흐름을 확인한 뒤, 앞서 만든 별도 작업 스레드에서 인증서 저장 폴더를 찾는 과정을 확인해보았다.
 `GetDriveTypeA` 결과를 통해 고정 드라이브 `3`과 이동식 드라이브 `2`를 선택한다.
 
 <figure class="analysis-figure">
@@ -1174,9 +1207,9 @@ mov [eax], cl   ; 복원한 문자를 저장한다.
 
 
 이 부분은 다운로드 함수가 바로 이어서 인증서를 찾는다는 뜻이 아니라, **앞서 별도로 생성한 작업 스레드의 흐름으로 돌아가 분석한 것**이다.
-보충 분석에서 `sub_10003C10`은 Windows 폴더 아래의 `WINDOWS32INI.ini` 경로를 준비하고, `sub_10003B40`으로 `dcer` 설정값을 읽는 부분을 확인하였다.
+추가로 `sub_10003C10` 내부를 확인해보니 Windows 폴더 아래의 `WINDOWS32INI.ini` 경로를 준비하고, `sub_10003B40`으로 `dcer` 설정값을 읽고 있었다.
 이 파일은 시스템 디렉터리의 `Windowsxp.ini`, `Windowsxp32.ini`와 구분해야 한다.
-설정과 실행 조건을 거쳐 NPKI 탐색으로 연결되므로, 서비스가 실행 중이라는 사실만으로 매 순간 인증서를 수집한다고 단정하지 않았다.
+이후 설정값과 실행 조건을 검사한 뒤 NPKI 탐색으로 이어지므로, 서비스 실행 여부와 인증서 수집 조건을 따로 확인할 필요가 있다.
 
 또한 NPKI 폴더나 대상 파일을 찾지 못하면 확인한 흐름에서는 해당 파일의 수집 단계로 이어지지 않는다.
 그렇다고 **서비스 실행이나 추가 다운로드 등 악성코드의 다른 기능까지 모두 중단된다는 뜻은 아니다.**
@@ -1195,7 +1228,7 @@ NPKI 아래에서 대상 사용자 폴더를 찾으면 `signCert.der`와 `signPr
 
 
 이후 `sub_10005870`에서 두 파일 내용을 읽어 저장하고, 전송할 본문을 만드는 `sub_10003FA0`을 호출한다.
-기초 정적 분석에서 발견한 파일명 문자열이 실제 파일 접근 코드와 연결되는 지점이다.
+아까 기초 정적 분석의 문자열 목록에서 봤던 두 파일 이름이 이 부분에서 사용되는 것을 확인할 수 있었다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-77.png" target="_blank" rel="noopener noreferrer" aria-label="두 파일을 읽고 전송 본문 생성 함수 호출 — 원본 보기">
@@ -1207,14 +1240,14 @@ NPKI 아래에서 대상 사용자 폴더를 찾으면 `signCert.der`와 `signPr
 
 여기서 **`signCert.der`는 인증서 파일 이름**, **`signPri.key`는 개인키 파일 이름**이다.
 NPKI라는 폴더 자체를 전부 보내는 것이 아니라, 그 아래에서 두 파일을 찾아 내용을 읽는 흐름이다.
-`폴더 경로 + 파일 이름`으로 문자열을 만드는 단계와 `sub_10005870`에서 파일 내용을 읽는 단계도 나누어 보았다.
-기초 정적 분석의 문자열이 실제 수집 대상으로 연결되는 근거는 이 파일 읽기와 후속 호출에 있다.
+먼저 `폴더 경로 + 파일 이름`으로 경로를 만들고, 이후 `sub_10005870`에서 파일 내용을 읽는다.
+이어서 읽은 데이터를 어디로 전달하는지 확인해보았다.
 
 ### 5.11. HTTP POST 본문 구성과 전송
 
-읽어 둔 두 파일의 내용을 하나의 전송 데이터로 묶는다.
-`sprintf`로 `1.der`, `1.key`와 같은 파일명 및 형식 정보를 붙여 각 파일을 구분할 수 있게 구성한다.
-앞서 확인한 `multipart/form-data` 문자열과 연결해서 볼 수 있는 부분이다.
+앞서 읽은 인증서와 개인키 파일 내용을 서버로 보내기 위해 하나의 데이터로 묶는다.
+이때 `sprintf`로 **`1.der`, `1.key`라는 파일명과 파일 형식 정보**를 붙여 각 파일을 구분할 수 있도록 구성한다.
+기초 정적 분석에서 봤던 `multipart/form-data` 문자열이 여기에서 사용되는 것을 확인할 수 있다.
 
 <figure class="analysis-figure">
   <a href="/assets/images/npki-analysis/figure-78.png" target="_blank" rel="noopener noreferrer" aria-label="인증서·개인키를 포함하는 전송 본문 구성 — 원본 보기">
@@ -1242,19 +1275,19 @@ NPKI라는 폴더 자체를 전부 보내는 것이 아니라, 그 아래에서 
 </figure>
 
 
-자료에는 이 POST 요청으로 실제 인증정보가 외부에 전달되었다는 패킷이나 서버 수신 결과가 제시되어 있지 않다.
-따라서 **인증정보를 수집해 전송하려는 코드가 확인되었다**고 정리하였다.
+여기까지 **인증서와 개인키 파일을 읽고 HTTP POST로 전송을 시도하는 코드**를 확인하였다.
+다만 실제 외부 서버에 전달되었는지는 패킷이나 서버 수신 결과로 추가 확인이 필요하다.
 
 `multipart/form-data`는 여러 파일이나 값을 **각 부분으로 구분해 하나의 HTTP 요청 본문에 넣는 형식**이다.
 경계 문자열과 각 부분의 헤더로 인증서 데이터와 개인키 데이터를 구분한다.
-따라서 두 파일을 함께 보낸다는 설명과 각각 구분해 보낸다는 설명은 모순되지 않는다.
+즉, 인증서와 개인키를 하나의 요청에 담되 각 파일의 내용은 구분할 수 있도록 만든다.
 
 이때 `1.der`, `1.key`는 전송 본문에서 붙이는 파일명이다.
 앞의 GET 요청 경로인 `/main/m0913.txt`, `/main/main0913.txt`는 받아올 내용을 지정하므로 역할이 다르다.
 **GET으로 응답을 요청하는 흐름과 POST로 수집한 데이터를 전송하려는 흐름**을 따로 연결해서 보았다.
 
 또한 `HttpOpenRequestA`는 요청 방식과 경로를 정해 요청을 준비하고, `HttpSendRequestA`는 준비한 요청에 본문을 전달해 전송을 시도한다.
-요청 준비, 전송 호출, 실제 상대 서버의 수신까지를 하나의 성공으로 묶지 않았다.
+여기서는 요청을 구성하고 전송 함수를 호출하는 부분까지 확인할 수 있다.
 
 ### 5.12. DNS 조회 후 IP로 재시도
 
@@ -1276,21 +1309,21 @@ NPKI라는 폴더 자체를 전부 보내는 것이 아니라, 그 아래에서 
 </figure>
 
 
-발표에서 정리한 후속 흐름은 `sub_10002250`에서 URL의 호스트를 조회한 IP로 바꾸고, 기존 요청 경로를 유지해 다시 전송을 시도하는 것이다.
+이후 `sub_10002250`에서 URL의 호스트 부분을 조회한 IP로 바꾸고, 기존 요청 경로를 유지하여 다시 전송을 시도한다.
 여기서 `8.8.8.8`은 DNS 조회에 쓰이는 주소로 구분해야 하며, 인증정보를 받는 서버 주소라고 해석하면 안 된다.
 
 DNS 조회는 **호스트 이름에 대응하는 IP 주소를 알아내는 단계**이고, 인증서 데이터를 보내는 POST는 별도의 통신이다.
 따라서 DNS 서버 주소가 코드에 있다는 사실만으로 그 주소가 정보 수신처라고 판단하면 안 된다.
-`sub_10002250`의 후속 처리에서는 URL의 호스트 부분을 조회 결과로 바꾸고 요청 경로를 유지하는 흐름으로 정리하였다.
-이는 재시도 기능을 설명하는 근거이며, DNS 조회나 후속 POST가 실제로 성공했다는 증거와는 구분하였다.
+따라서 전송 실패 이후에 다른 방식으로 접속을 재시도하는 코드를 확인할 수 있었다.
+DNS 조회와 재전송의 실제 성공 여부는 추가 확인이 필요하다.
 
 ### 5.13. 인증서·개인키 파일을 함께 수집하는 이유
 
 인증서 파일에는 공개키와 주체 정보 등이 들어 있고, 대응되는 개인키는 전자서명이나 인증 과정에 필요한 비밀 정보이다.
 두 파일이 함께 유출되면 **소유자를 가장한 인증이나 서명 시도에 악용될 가능성**이 있다.
 다만 개인키 암호 보호, 비밀번호, 추가 인증과 서비스 정책에 따라 실제 사용 가능 여부는 달라진다.
-이번 자료에서 비밀번호 복구나 복호화, 실제 로그인·거래 성공까지 확인한 것은 아니다.
-따라서 수집 파일만으로 특정 금융 피해가 발생했다고 결론 내리지 않고, **인증정보 수집·전송 기능을 가진 정보 탈취형 악성코드**로 정리하였다.
+이번 분석에서는 비밀번호 복구나 복호화, 실제 로그인·거래 성공 여부까지 확인하지는 않았다.
+확인한 코드의 동작을 종합하면 **인증정보를 수집해 외부로 전송하려는 정보 탈취형 악성코드**로 판단된다.
 
 <h2 id="conclusion">6. 분석 결과 정리</h2>
 
@@ -1321,12 +1354,9 @@ DNS 조회는 **호스트 이름에 대응하는 IP 주소를 알아내는 단�
 이를 종합하면 **원본 EXE는 내부 DLL을 설치하고 서비스로 실행시키는 드로퍼 역할**을 한다.
 **64to32.dll은 추가 파일 다운로드·실행 기능과 NPKI 인증서·개인키 수집 및 전송 기능을 가진 정보 탈취형 DLL**로 판단하였다.
 
-이번 분석에서는 PEStudio에서 본 문자열과 API를 출발점으로 삼고, 동적 분석에서 생성된 파일과 서비스를 확인한 다음, IDA에서 각각의 호출 흐름을 연결하였다.
-특히 내부 리소스의 DLL과 실행 후 생성된 DLL의 해시를 비교한 과정이 EXE와 DLL의 관계를 확인하는 근거가 되었다.
+기초 정적 분석에서 내부 DLL과 의심스러운 API, 문자열을 확인하고, 실제 실행 후 생성된 파일과 서비스를 비교하였다.
+특히 Resource Hacker로 분리한 DLL과 생성된 `64to32.dll`의 크기·해시가 같다는 것을 확인할 수 있었다.
+이후 IDA에서 서비스 설정, 추가 파일 다운로드·실행, NPKI 파일 수집·전송 코드를 차례로 확인하였다.
 
 다만 인증서·개인키 파일의 전송 기능을 확인한 것과 실제 유출에 성공한 것은 다르다.
-추가 파일 실행, 다른 드라이브로의 복사, 최종 전송 성공 여부는 별도의 실행 결과로 확인해야 할 부분으로 남겼다.
-
----
-
-*자료: SecurityFirst 2026년 2학기 정규팀 4주차 세미나 발표 자료 — 이하늘, 2026.10.28. 본문의 분석 화면은 해당 발표 자료에서 가져왔다.*
+추가 파일 실행, 다른 드라이브로의 복사, 최종 전송의 실제 성공 여부는 추가 확인이 필요하다.
