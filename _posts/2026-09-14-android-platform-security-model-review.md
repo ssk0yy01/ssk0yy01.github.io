@@ -2,13 +2,11 @@
 layout: post
 title: "The Android Platform Security Model (2023)"
 description: "Android의 위협 모델, 다자간 인가, 샌드박스와 보안 구현을 정리한 논문 리뷰"
-date: 2026-11-05 00:00:00 +0900
+date: 2026-09-14 00:00:00 +0900
 categories: [papers-conferences]
 ---
 
 논문 리뷰 목표 : 안드로이드는 앱이 마음대로 다른 앱이나 시스템에 접근하지 못하도록 어떻게 설계되어 있을까 학습하는 것이 목표이다.
-
-(2026\_2학기에 한 <strong>SSA 연합 프로젝트에 대한 공부</strong>이다)
 
 [논문 원문 보기](https://arxiv.org/abs/1904.05572)
 

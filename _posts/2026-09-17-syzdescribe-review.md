@@ -2,13 +2,11 @@
 layout: post
 title: "SyzDescribe: Principled, Automated, Static Generation of Syscall Descriptions for Kernel Drivers (2023)"
 description: "Linux 커널 드라이버의 초기화·등록 관계를 정적 분석하여 시스템 콜 설명을 자동 생성하는 SyzDescribe 논문 리뷰"
-date: 2026-11-05 00:00:00 +0900
+date: 2026-09-17 00:00:00 +0900
 categories: [papers-conferences]
 ---
 
 논문 리뷰 목표 : <strong>SyzDescribe가 Linux 커널 드라이버의 시스템 콜 설명을 어떤 근거로 자동 생성하는지 이해하고, 이 과정에서 드라이버 초기화·장치 파일·시스템 콜 핸들러·ioctl 명령 값·인자 형식·의존 관계가 어떻게 연결되는지 학습하는 것</strong>이 목표이다.
-
-<strong>(2026-2학기 SSA 연합 프로젝트 관련 학습)</strong>
 
 [논문 원문 보기](https://ieeexplore.ieee.org/document/10179298/)
 

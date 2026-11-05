@@ -2,11 +2,9 @@
 layout: post
 title: "BigMAC: Fine-Grained Policy Analysis of Android Firmware (2020)"
 description: "Android 펌웨어의 DAC·MAC·Capability를 통합해 공격 경로를 분석하는 BigMAC 논문 리뷰"
-date: 2026-11-05 00:00:00 +0900
+date: 2026-09-10 00:00:00 +0900
 categories: [papers-conferences]
 ---
-
-<strong>본 논문 리뷰는 2026\_2학기 SSA 프로젝트에 관한 공부이다.</strong>
 
 [논문 원문 보기](https://www.usenix.org/conference/usenixsecurity20/presentation/hernandez)
 
