@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[SF 정규팀 4주차] NPKI 인증정보 탈취 악성코드 분석"
+title: "NPKI 인증정보 탈취 악성코드 분석"
 description: "원본 EXE의 DLL 설치부터 64to32.dll의 서비스 실행, 추가 파일 다운로드와 NPKI 인증서·개인키 수집 및 전송 코드까지 분석한 기록"
 date: 2026-10-28 10:00:00 +0900
 categories: [malware-analysis, blog-docs]
