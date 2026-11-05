@@ -3,7 +3,7 @@ const { runInNewContext } = require('node:vm');
 const assert = require('node:assert/strict');
 
 function mount(topics) {
-  const buttons = ['all', 'web', 'blog', 'malware-analysis', 'sf', 'knife', 'other'].map(filter => ({
+  const buttons = ['all', 'web', 'blog', 'malware-analysis', 'reversing', 'other'].map(filter => ({
     dataset: { filter },
     setAttribute(name, value) { this[name] = value; },
     addEventListener(event, handler) { this.click = handler; }
@@ -28,16 +28,16 @@ assert.deepEqual(page.posts.map(post => post.hidden), [true, false, true]);
 assert.equal(page.count.textContent, '1개');
 assert.equal(page.buttons[1]['aria-pressed'], 'true');
 assert.equal(page.buttons[0]['aria-pressed'], 'false');
-page.buttons[6].click();
+page.buttons[5].click();
 assert.deepEqual(page.posts.map(post => post.hidden), [true, true, false]);
 page.buttons[0].click();
 assert.equal(page.posts.filter(post => !post.hidden).length, 3);
-const overlapping = mount(['reversing sf malware-analysis blog-docs', 'other knife blog-docs']);
+const overlapping = mount(['reversing malware-analysis blog-docs', 'blog blog-docs']);
 overlapping.buttons[3].click();
 assert.deepEqual(overlapping.posts.map(post => post.hidden), [false, true]);
 overlapping.buttons[4].click();
 assert.deepEqual(overlapping.posts.map(post => post.hidden), [false, true]);
-overlapping.buttons[5].click();
+overlapping.buttons[2].click();
 assert.deepEqual(overlapping.posts.map(post => post.hidden), [true, false]);
 const sparse = mount(['blog']);
 sparse.buttons[1].click();
