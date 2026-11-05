@@ -10,7 +10,7 @@ if (filterArea) {
   function selectTopic(topic) {
     let visible = 0;
     posts.forEach(post => {
-      post.hidden = topic !== 'all' && post.dataset.topic !== topic;
+      post.hidden = topic !== 'all' && !post.dataset.topic.split(' ').includes(topic);
       if (!post.hidden) visible++;
     });
     buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === topic)));

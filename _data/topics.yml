@@ -14,5 +14,11 @@
   title: AI
 - key: blog
   title: 블로그
+- key: malware-analysis
+  title: 악성코드 분석
+- key: sf
+  title: SF
+- key: knife
+  title: 나이프
 - key: other
   title: 기타
