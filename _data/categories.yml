@@ -34,3 +34,21 @@
   description: 도전한 활동과 준비 과정을 차곡차곡 쌓습니다.
   path: /categories/competitions-certificates/
   number: "06"
+- key: malware-analysis
+  title: 악성코드 분석
+  english: MALWARE ANALYSIS
+  description: 악성코드 분석 기록을 모읍니다.
+  path: /categories/malware-analysis/
+  number: "07"
+- key: sf
+  title: SF
+  english: SECURITYFIRST
+  description: SecurityFirst 활동을 기록합니다.
+  path: /categories/sf/
+  number: "08"
+- key: knife
+  title: 나이프
+  english: KNIGHTS FRONTIER
+  description: 나이츠프론티어 활동을 기록합니다.
+  path: /categories/knife/
+  number: "09"
