@@ -40,3 +40,9 @@
   description: 악성코드 분석 기록을 모읍니다.
   path: /categories/malware-analysis/
   number: "07"
+- key: research
+  title: 리서치
+  english: RESEARCH
+  description: 주제를 탐구하고 분석한 기록을 모읍니다.
+  path: /categories/research/
+  number: "08"
