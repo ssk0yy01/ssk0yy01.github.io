@@ -160,6 +160,7 @@ a.credential-card:hover .credential-copy strong { color: #773bd8; }
 .article-body a { color: #773bd8; text-underline-offset: 4px; }
 .article-body a:hover { text-decoration: underline; }
 .article-body img { max-width: 100%; height: auto; border-radius: 10px; }
+.article-body img[src^="/assets/images/cryptohack-intro-1-10/"] { display: block; max-width: min(100%, 640px); margin-inline: auto; }
 .analysis-figure { margin: 26px 0; }
 .analysis-figure img { display: block; border: 1px solid var(--line); }
 .analysis-figure figcaption { margin-top: 10px; color: var(--muted); font-size: 15px; }
