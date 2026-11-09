@@ -7,19 +7,29 @@ categories: [ctf-wargame]
 topic: cryptography
 ---
 
-> 플랫폼: [CryptoHack](https://cryptohack.org/) · [원본 풀이 노트](https://app.notion.com/p/410640930b8a804eb060c9d3108459cf)
+> 플랫폼: [CryptoHack](https://cryptohack.org/)
 
 CryptoHack 입문 문제 1~10번을 풀며 사용한 코드와 핵심 개념을 정리했다. 1~2번은 플랫폼 사용법, 3~6번은 인코딩, 7~10번은 XOR을 다룬다. 플래그 값은 이 글에 적지 않았다.
 
 ## 1. Finding Flags
 
+![Finding Flags 문제 화면](/assets/images/cryptohack-intro-1-10/01-1.png)
+
 플래그 형식을 확인하고 제출하는 연습이다. 플래그는 일반적으로 `crypto{...}` 형태다. 문제 화면에 제시된 값을 입력해 제출했다.
 
 ## 2. Great Snakes
 
+![Great Snakes 문제 화면](/assets/images/cryptohack-intro-1-10/02-1.png)
+
 제공된 파이썬 스크립트를 내려받아 실행하면 플래그가 출력된다. 이후 문제에서도 파이썬으로 데이터를 변환하고 결과를 확인했다.
 
+![Great Snakes 실행 화면](/assets/images/cryptohack-intro-1-10/02-2.png)
+
+![Great Snakes 완료 화면](/assets/images/cryptohack-intro-1-10/02-3.png)
+
 ## 3. ASCII
+
+![ASCII 문제 화면](/assets/images/cryptohack-intro-1-10/03-1.png)
 
 주어진 정수 목록을 ASCII 문자로 바꾼다. `chr()`은 정수 하나를 문자 하나로 변환하므로 각 숫자에 적용한 뒤 `join()`으로 이어 붙였다. `ord()`는 반대 방향의 함수다.
 
@@ -28,7 +38,11 @@ numbers = [99, 114, 121, 112, 116, 111, 123, 65, 83, 67, 73, 73, 95, 112, 114, 4
 print(''.join(chr(n) for n in numbers))
 ```
 
+![ASCII 풀이 결과](/assets/images/cryptohack-intro-1-10/03-2.png)
+
 ## 4. Hex
+
+![Hex 문제 화면](/assets/images/cryptohack-intro-1-10/04-1.png)
 
 `bytes.fromhex()`로 16진수 문자열을 바이트로 변환하고, `.decode()`로 읽을 수 있는 문자로 바꿨다.
 
@@ -37,7 +51,11 @@ hex_text = "63727970746f7b596f755f77696c6c5f62655f776f726b696e675f776974685f6865
 print(bytes.fromhex(hex_text).decode())
 ```
 
+![Hex 풀이 결과](/assets/images/cryptohack-intro-1-10/04-2.png)
+
 ## 5. Base64
+
+![Base64 문제 화면](/assets/images/cryptohack-intro-1-10/05-1.png)
 
 주어진 16진수를 먼저 바이트로 디코딩한다. 그 바이트를 Base64로 인코딩하고 결과를 문자로 표시했다.
 
@@ -48,7 +66,11 @@ hex_text = "72bca9b68fc16ac7beeb8f849dca1d8a783e8acf9679bf9269f7bf"
 print(base64.b64encode(bytes.fromhex(hex_text)).decode())
 ```
 
+![Base64 풀이 결과](/assets/images/cryptohack-intro-1-10/05-2.png)
+
 ## 6. Bytes and Big Integers
+
+![Bytes and Big Integers 문제 화면](/assets/images/cryptohack-intro-1-10/06-1.png)
 
 정수로 표현된 메시지를 `long_to_bytes()`로 바이트로 되돌렸다.
 
@@ -62,7 +84,11 @@ print(message.decode())
 
 `Crypto` 모듈이 없다면 `python -m pip install pycryptodome`로 설치할 수 있다.
 
+![Bytes and Big Integers 풀이 결과](/assets/images/cryptohack-intro-1-10/06-2.png)
+
 ## 7. XOR Starter
+
+![XOR Starter 문제 화면](/assets/images/cryptohack-intro-1-10/07-1.png)
 
 XOR(`^`)은 두 비트가 다르면 1, 같으면 0을 반환한다. `ord()`로 각 문자를 숫자로 바꾸고 13과 XOR한 다음 `chr()`로 다시 문자로 바꿨다.
 
@@ -76,7 +102,11 @@ for letter in text:
 print("crypto{" + result + "}")
 ```
 
+![XOR Starter 풀이 결과](/assets/images/cryptohack-intro-1-10/07-2.png)
+
 ## 8. XOR Properties
+
+![XOR Properties 문제 화면](/assets/images/cryptohack-intro-1-10/08-1.png)
 
 같은 값을 두 번 XOR하면 사라진다. `A ^ A = 0`, `A ^ 0 = A`이므로 마지막 식에 `KEY1`과 `(KEY2 ^ KEY3)`을 다시 XOR하면 키가 모두 지워진다.
 
@@ -95,7 +125,11 @@ flag = encrypted ^ key1 ^ key2_xor_key3
 print(long_to_bytes(flag).decode())
 ```
 
+![XOR Properties 풀이 결과](/assets/images/cryptohack-intro-1-10/08-2.png)
+
 ## 9. Favourite byte
+
+![Favourite byte 문제 화면](/assets/images/cryptohack-intro-1-10/09-1.png)
 
 모든 바이트가 동일한 1바이트 키로 XOR되었다. 가능한 키 0~255를 모두 시험하고 플래그 형식으로 시작하는 결과를 골랐다.
 
@@ -109,7 +143,11 @@ for key in range(256):
         print(result.decode())
 ```
 
+![Favourite byte 풀이 결과](/assets/images/cryptohack-intro-1-10/09-2.png)
+
 ## 10. You either know, XOR you don't
+
+![반복 XOR 문제 화면](/assets/images/cryptohack-intro-1-10/10-1.png)
 
 플래그가 `crypto{`로 시작한다는 점을 이용해 암호문의 첫 7바이트와 XOR하면 키의 앞부분 `myXORke`를 얻는다. 마지막 글자를 `y`로 추측해 `myXORkey`를 반복 적용했고, 출력이 읽을 수 있는 플래그인지 확인했다. 마지막 글자와 키 길이는 앞 7바이트만으로 확정되는 것은 아니다.
 
@@ -129,3 +167,7 @@ print(result.decode())
 ```
 
 `i % len(key)`로 키를 처음부터 반복한다. 같은 키로 XOR을 한 번 더 적용하면 원래 값으로 돌아오는 성질을 이용했다.
+
+![반복 XOR 풀이 결과](/assets/images/cryptohack-intro-1-10/10-2.png)
+
+![Introduction to CryptoHack 완료 화면](/assets/images/cryptohack-intro-1-10/10-3.png)
