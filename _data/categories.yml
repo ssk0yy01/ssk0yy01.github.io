@@ -46,3 +46,9 @@
   description: 주제를 탐구하고 분석한 기록을 모읍니다.
   path: /categories/research/
   number: "08"
+- key: android
+  title: 안드로이드
+  english: ANDROID SECURITY
+  description: 안드로이드 보안 분석과 실습 기록을 모읍니다.
+  path: /categories/android/
+  number: "09"
