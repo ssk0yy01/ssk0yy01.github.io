@@ -21,7 +21,7 @@ categories: [android]
 
 ```java
 /sdcard
-/storage/emulated/0 
+/storage/emulated/0
 
 /sdcard 경로는 2번째 /storage/emulated/0 경로에서 어느정도 앱과 사용자가 편하게 접근하도록 만든
 호환성을 챙긴 짧은 형태로 변환된 경로이다.
@@ -114,4 +114,3 @@ fos.close();
 ![OWASP MASTG 문제 5 실습 화면](/assets/images/owasp-mastg-playground/problem-05-03.png)
 
 이렇게 cat으로 내부를 보면 L33tS3cr3t도 정상적으로 데이터가 들어있는 것을 확인 하였다.
-

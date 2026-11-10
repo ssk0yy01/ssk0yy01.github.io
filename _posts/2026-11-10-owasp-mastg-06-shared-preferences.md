@@ -83,4 +83,3 @@ SecurityException: MODE_WORLD_READABLE no longer supported
 ```
 
 ![OWASP MASTG 문제 6 실습 화면](/assets/images/owasp-mastg-playground/problem-06-01.png)
-

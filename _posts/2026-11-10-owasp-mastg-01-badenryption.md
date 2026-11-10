@@ -178,4 +178,3 @@ str에는 사용자가 입력한 비밀번호가 담기고 비교를 해서 같�
 ![OWASP MASTG 문제 1 실습 화면](/assets/images/owasp-mastg-playground/problem-01-02.png)
 
 이렇게 애뮬레이터에서 실행 해보면 Congratulations, this is the correct password라는 문자열이 나오며 성공하게 된다.
-

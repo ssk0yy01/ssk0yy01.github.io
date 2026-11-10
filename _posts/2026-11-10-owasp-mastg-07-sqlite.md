@@ -42,7 +42,7 @@ public class OMTG_DATAST_001_SQLite_Not_Encrypted extends AppCompatActivity {
 ```java
 SQLite란?
 - 앱이 표 형태로 데이터를 저장하는 파일입니다.
-- 이 실습의 목표는 앱에서 OMTG_DATAST_001_SQLITE 화면을 연 뒤, 
+- 이 실습의 목표는 앱에서 OMTG_DATAST_001_SQLITE 화면을 연 뒤,
   생성된 데이터베이스를 찾아 계정 정보가 평문으로 저장됐는지 확인하는 것이다.
 ```
 
@@ -75,4 +75,3 @@ admin|AdminPass
 ```
 
 ![OWASP MASTG 문제 7 실습 화면](/assets/images/owasp-mastg-playground/problem-07-02.png)
-
