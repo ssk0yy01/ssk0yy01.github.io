@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Introduction to CryptoHack 1~10번 풀이"
+title: "CryptoHack 소개 1~10 풀이"
 description: "CryptoHack 입문 문제 1~10번의 인코딩과 XOR 풀이 기록"
 date: 2026-11-09 00:00:00 +0900
 categories: [ctf-wargame]
@@ -170,4 +170,7 @@ print(result.decode())
 
 ![반복 XOR 풀이 결과](/assets/images/cryptohack-intro-1-10/10-2.png)
 
-![Introduction to CryptoHack 완료 화면](/assets/images/cryptohack-intro-1-10/10-3.png)
+<figure class="completion-proof">
+  <img src="/assets/images/cryptohack-intro-1-10/10-3.png" alt="CryptoHack 소개 1~10 완료 인증">
+  <figcaption>CryptoHack 소개 1~10 완료 인증</figcaption>
+</figure>
