@@ -1,10 +1,13 @@
 ---
 layout: post
 title: "OWASP MASTG Hacking Playground #3: KEYSTORE"
-description: "AndroidKeyStore의 RSA 키 생성과 암호화·복호화, 개인키 추출 제한을 확인한 실습"
+description: "OWASP MASTG Hacking Playground 3번 문제 분석과 실습 기록"
 date: 2026-11-10 03:00:00 +0900
 categories: [android]
 ---
+
+{% raw %}
+> 테스트 항목: `OMTG_DATAST_001_KeyStore`
 
 설명 : AndroidKeyStore에 키 쌍을 안전하게 생성하고, 그 키로 문자열을 암호화·복호화하는 방법을 보여준다.
 
@@ -182,20 +185,20 @@ KeyPair keyPair = generator.generateKeyPair();
 
 화면을 여는 순간 Dummy라는 이름의 RSA 키가 생성된다.
 
-- 키 이름: <code>Dummy</code>
+- 키 이름: `Dummy`
 - 공개키와 개인키로 구성된 RSA 키 쌍
-- 개인키는 <code>AndroidKeyStore</code> 내부에 생성
+- 개인키는 `AndroidKeyStore` 내부에 생성
 - 개인키 원본은 앱 밖으로 꺼낼 수 없어야 함
 
-![OWASP MASTG 문제 3 실습 화면](/assets/images/owasp-mastg-playground/problem-03-01.png)
+![OWASP MASTG 문제 3 실습 화면 1](/assets/images/owasp-mastg-playground/problem-03-01.png)
 
-![OWASP MASTG 문제 3 실습 화면](/assets/images/owasp-mastg-playground/problem-03-02.png)
+![OWASP MASTG 문제 3 실습 화면 2](/assets/images/owasp-mastg-playground/problem-03-02.png)
 
-이렇게 문자열을 입력하고 아래의 <code>ENCRYPT</code>를 누르면 중간처럼 우리가 볼 수 없는 Base64 문자열이 나온다.
+이렇게 문자열을 입력하고 아래의 `ENCRYPT`를 누르면 중간처럼 우리가 볼 수 없는 Base64 문자열이 나온다.
 
 그리고 그 바로 아랫 부분 DECRYPT를 누르면 다시 제대로 된 문자열이 그대로 출력된다.
 
-이 부분은 결과적으로 내부 개인키로 암호화하고 복호화하는 과정까지 들어있는 화면이다.
+이 부분은 결과적으로 내부 공개키로 암호화하고 복호화하는 과정까지 들어있는 화면이다.
 
 이제 이 정보를 토대로 아래 명령어를 실행 해주었다.
 
@@ -204,7 +207,7 @@ KeyPair keyPair = generator.generateKeyPair();
   'OMTG_DATAST_001_KeyStore:V' '*:S'
 ```
 
-![OWASP MASTG 문제 3 실습 화면](/assets/images/owasp-mastg-playground/problem-03-03.png)
+![OWASP MASTG 문제 3 실습 화면 3](/assets/images/owasp-mastg-playground/problem-03-03.png)
 
 로그를 보니까 PID 5284에서 test log : 12345678로 문자열이 로그에 기록된 결과가 보이고 있다.
 
@@ -221,5 +224,6 @@ null
 - 입력한 글자를 공개키로 암호화했습니다.
 - AndroidKeyStore 안의 개인키로 다시 복호화했습니다.
 - 원래 글자가 나왔으므로 암호화·복호화가 정상 작동했습니다.
-- 개인키 파일을 밖으로 꺼내려고 했지만 결과가 <code>null</code>이었습니다.
-- 따라서 <strong>개인키 추출은 실패했고, 취약점도 발견되지 않았습니다.</strong>
+- 개인키 파일을 밖으로 꺼내려고 했지만 결과가 `null`이었습니다.
+- 따라서 **개인키 추출은 실패했고, 취약점도 발견되지 않았습니다.**
+{% endraw %}

@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "OWASP MASTG Hacking Playground #1: BADENRYPTION"
-description: "취약한 XOR·비트 반전 암호화 로직을 역연산해 비밀번호를 찾는 실습"
+title: "OWASP MASTG Hacking Playground #1: BAD ENCRYPTION"
+description: "OWASP MASTG Hacking Playground 1번 문제 분석과 실습 기록"
 date: 2026-11-10 01:00:00 +0900
 categories: [android]
 ---
 
-MASTG Hacking Playground 안드로이드 앱의 24개 테스트 케이스를 에뮬레이터에서 직접 발화·익스플로잇하고, 각 취약점을 실측 증거와 함께 라이트업으로 정리한다
+{% raw %}
+> 테스트 항목: `OMTG_DATAST_001_BadEncryption`
 
 ### 1번 : 비밀번호를 찾아라. 소스를 읽고 어떤 종류의 암호화가 사용됐는지 알아내라.
 
@@ -94,7 +95,7 @@ OMTG_DATAST_001_BadEncryption.this.result(result);
 }
 ```
 
-코드를 전체적으로 분석 해본 결과 이 부분이 사용자가 입력한 비밀번호를 <code>verify</code>라는 정답 검사 함수에 전달하는 코드다.
+코드를 전체적으로 분석 해본 결과 이 부분이 사용자가 입력한 비밀번호를 `verify`라는 정답 검사 함수에 전달하는 코드다.
 
 핵심 순서는 다음과 같다.
 
@@ -103,7 +104,7 @@ OMTG_DATAST_001_BadEncryption.this.result(result);
 3. getText()로 입력 내용을 가져온다.
 4. toString() 으로 문자열을 만든다.
 5. verify()로 정답인지 검사한다.
-6. 맞으면 성공, 틀리면 실패 메세지를 반환한다.
+6. 맞으면 성공, 틀리면 실패 메시지를 반환한다.
 
 그래서 핵심은 실제로 비밀번호가 담기는 곳 verify() 함수와 encrypt() 함수의 값을 살펴봐야 한다는 것이다.
 
@@ -171,10 +172,11 @@ str에는 사용자가 입력한 비밀번호가 담기고 비교를 해서 같�
 
 위와 같은 방식으로 역연산 코드를 짜주고 실행을 하면 된다.
 
-![OWASP MASTG 문제 1 실습 화면](/assets/images/owasp-mastg-playground/problem-01-01.png)
+![OWASP MASTG 문제 1 실습 화면 1](/assets/images/owasp-mastg-playground/problem-01-01.png)
 
 그러면 이렇게 SuperSecret 이라는 문자열이 노출된다.
 
-![OWASP MASTG 문제 1 실습 화면](/assets/images/owasp-mastg-playground/problem-01-02.png)
+![OWASP MASTG 문제 1 실습 화면 2](/assets/images/owasp-mastg-playground/problem-01-02.png)
 
-이렇게 애뮬레이터에서 실행 해보면 Congratulations, this is the correct password라는 문자열이 나오며 성공하게 된다.
+이렇게 에뮬레이터에서 실행 해보면 Congratulations, this is the correct password라는 문자열이 나오며 성공하게 된다.
+{% endraw %}

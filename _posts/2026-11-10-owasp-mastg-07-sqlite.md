@@ -1,12 +1,15 @@
 ---
 layout: post
-title: "OWASP MASTG Hacking Playground #7: SQLITE"
-description: "암호화되지 않은 SQLite 데이터베이스에서 평문 계정 정보를 확인한 실습"
+title: "OWASP MASTG Hacking Playground #7: SQLITE NOT ENCRYPTED"
+description: "OWASP MASTG Hacking Playground 7번 문제 분석과 실습 기록"
 date: 2026-11-10 07:00:00 +0900
 categories: [android]
 ---
 
-![OWASP MASTG 문제 7 실습 화면](/assets/images/owasp-mastg-playground/problem-07-01.png)
+{% raw %}
+> 테스트 항목: `OMTG_DATAST_001_SQLite_Not_Encrypted`
+
+![OWASP MASTG 문제 7 실습 화면 1](/assets/images/owasp-mastg-playground/problem-07-01.png)
 
 문제 설명 : 새 SQLite 데이터베이스가 만들어졌습니다. 그 안에서 중요한 정보를 찾아보세요.
 
@@ -57,9 +60,9 @@ private void SQLiteUnsafe() {
     }
 ```
 
-위 코드를 보면 <code>privateNotSoSecure</code>라는 이름의 데이터베이스 파일을 열고, 없다면 새롭게 만든다.
+위 코드를 보면 `privateNotSoSecure`라는 이름의 데이터베이스 파일을 열고, 없다면 새롭게 만든다.
 
-<code>Accounts</code>라는 표를 만들고, <code>Username</code>과 <code>Password</code> 칸을 준비한 후 사용자 이름 admin / 비밀번호 AdminPass를 그대로 저장시킨다.
+`Accounts`라는 표를 만들고, `Username`과 `Password` 칸을 준비한 후 사용자 이름 admin / 비밀번호 AdminPass를 그대로 저장시킨다.
 
 그 후 close로 데이터베이스를 닫는 간단한 코드이다.
 
@@ -74,4 +77,5 @@ admin|AdminPass
 안에 들어있는 내용까지 확인해본 결과 admin|AdminPass가 그대로 데이터베이스 내부에 저장되어있는 것을 확인할 수 있었다.
 ```
 
-![OWASP MASTG 문제 7 실습 화면](/assets/images/owasp-mastg-playground/problem-07-02.png)
+![OWASP MASTG 문제 7 실습 화면 2](/assets/images/owasp-mastg-playground/problem-07-02.png)
+{% endraw %}

@@ -1,10 +1,13 @@
 ---
 layout: post
-title: "OWASP MASTG Hacking Playground #4: INTERNALSTORAGE"
-description: "앱 내부 저장소에 평문으로 기록된 카드 번호를 찾아 확인한 실습"
+title: "OWASP MASTG Hacking Playground #4: INTERNAL STORAGE"
+description: "OWASP MASTG Hacking Playground 4번 문제 분석과 실습 기록"
 date: 2026-11-10 04:00:00 +0900
 categories: [android]
 ---
+
+{% raw %}
+> 테스트 항목: `OMTG_DATAST_001_InternalStorage`
 
 문제 설명 : 앱 내부 저장소에 새로운 파일이 생성됐다. 그 파일에서 중요한 정보를 찾아라.
 
@@ -49,11 +52,13 @@ public class OMTG_DATAST_001_InternalStorage extends AppCompatActivity {
 }
 ```
 
-![OWASP MASTG 문제 4 실습 화면](/assets/images/owasp-mastg-playground/problem-04-01.png)
+![OWASP MASTG 문제 4 실습 화면 1](/assets/images/owasp-mastg-playground/problem-04-01.png)
 
 이렇게 문제를 열면 어떤 본문들이 나오는데 번역해보면 다음과 같다.
 
-<strong>앱 내부 저장소에 새로운 파일이 생성됐다. 그 파일에서 중요한 정보를 찾아라.<br /></strong>앱 내부에 새로운 파일이 생성되었다고 한다.
+**앱 내부 저장소에 새로운 파일이 생성됐다. 그 파일에서 중요한 정보를 찾아라.
+
+**앱 내부에 새로운 파일이 생성되었다고 한다.
 
 코드를 분석해보니 다음과 같은 결과가 나왔다.
 
@@ -61,16 +66,16 @@ public class OMTG_DATAST_001_InternalStorage extends AppCompatActivity {
 protected void onCreate(Bundle savedInstanceState)
 ```
 
-사용자가 이 문제를 누르면 <code>onCreate</code>함수가 호출이 되며 실행된다.
+사용자가 이 문제를 누르면 `onCreate`함수가 호출이 되며 실행된다.
 
 ```java
 WhiteFile();
 fos = openFileOutput("test_file", 0);
 ```
 
-화면에 버튼이 없어도 자동으로 생성되고, 파일 명은 <code>test_file</code>이라는 이름으로 생성 되었다고 한다.
+화면에 버튼이 없어도 자동으로 생성되고, 파일 명은 `test_file`이라는 이름으로 생성 되었다고 한다.
 
-![OWASP MASTG 문제 4 실습 화면](/assets/images/owasp-mastg-playground/problem-04-02.png)
+![OWASP MASTG 문제 4 실습 화면 2](/assets/images/owasp-mastg-playground/problem-04-02.png)
 
 어느 경로에 생성되어 있는지 파악하지 못해서 명령어를 사용했더니 다음과 같은 경로에 존재하는 것을 확인할 수 있었다.
 
@@ -78,6 +83,7 @@ fos = openFileOutput("test_file", 0);
 /data/data/sg.vp.owasp_mobile.omtg_android/files/test_file
 ```
 
-심지어 cat 명령어로 파일을 읽으니까 파일 번호가 암호화되지 않고 그대로 평문으로 노출되는 대사고까지 일어나있는 것을 볼 수 있다. <code>(1234 4321 5678 8765)</code>
+심지어 cat 명령어로 파일을 읽으니까 파일 번호가 암호화되지 않고 그대로 평문으로 노출되는 대사고까지 일어나있는 것을 볼 수 있다. `(1234 4321 5678 8765)`
 
-결과로는 <strong>앱이 민감한 카드 번호를 내부 저장소 test\_file이 생성되고 이 파일 안에는 그냥 카드 번호가 그냥 평문으로 노출되어 있는 점을 확인할 수 있었다.</strong>
+결과로는 **앱이 민감한 카드 번호를 내부 저장소 test\_file이 생성되고 이 파일 안에는 그냥 카드 번호가 그냥 평문으로 노출되어 있는 점을 확인할 수 있었다.**
+{% endraw %}

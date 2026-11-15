@@ -1,10 +1,13 @@
 ---
 layout: post
-title: "OWASP MASTG Hacking Playground #6: SHARED-PREFERENCES"
-description: "SharedPreferences XML 파일에 저장된 계정 정보를 확인한 실습"
+title: "OWASP MASTG Hacking Playground #6: SHARED PREFERENCES"
+description: "OWASP MASTG Hacking Playground 6번 문제 분석과 실습 기록"
 date: 2026-11-10 06:00:00 +0900
 categories: [android]
 ---
+
+{% raw %}
+> 테스트 항목: `OMTG_DATAST_001_SharedPreferences`
 
 문제 설명 : 새로운 SharedPreferences 파일이 생성되었습니다. 그 안에서 중요한 정보를 찾아보세요.
 
@@ -82,4 +85,5 @@ SecurityException: MODE_WORLD_READABLE no longer supported
 명령어를 사용해서 name 값이 administrator, supersecret 등 평문으로 저장된 것을 확인 할 수 있었다.
 ```
 
-![OWASP MASTG 문제 6 실습 화면](/assets/images/owasp-mastg-playground/problem-06-01.png)
+![OWASP MASTG 문제 6 실습 화면 1](/assets/images/owasp-mastg-playground/problem-06-01.png)
+{% endraw %}
