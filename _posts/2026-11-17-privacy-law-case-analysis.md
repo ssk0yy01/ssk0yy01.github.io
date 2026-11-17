@@ -20,9 +20,9 @@ preserve_format: true
 ## 1. 사건명과 선정이유
 
 - 사건명: 도박공간개설·개인정보보호법위반
-- 대법원 판례: **대법원 2026. 4. 16. 선고 2026도477 판결**
-- 제1심: 의정부지방법원 남양주지원 2025. 8. 27. 선고 2025고단1185 판결
-- 제2심: 의정부지방법원 2025. 12. 19. 선고 2025노2686 판결
+- 대법원 판례: **대법원 2026.04.16. 선고 2026도477 판결**
+- 제1심: 의정부지방법원 남양주지원 2025.08.27. 선고 2025고단1185 판결
+- 제2심: 의정부지방법원 2025.12.19. 선고 2025노2686 판결
 - 최종 결과: 피고인 상고기각, 징역 1년 확정
 - [대법원 판결문 원문](https://www.law.go.kr/LSW/precInfoP.do?precSeq=619455)
 - [제1심 판결문](https://www.law.go.kr/LSW/precInfoP.do?precSeq=619545)
@@ -216,7 +216,7 @@ preserve_format: true
 
 ## + 참고
 
-- [대법원 2026. 4. 16. 선고 2026도477 판결](https://www.law.go.kr/LSW/precInfoP.do?precSeq=619455)
-- [의정부지방법원 2025. 12. 19. 선고 2025노2686 판결](https://www.law.go.kr/LSW/precInfoP.do?precSeq=619543)
-- [의정부지방법원 남양주지원 2025. 8. 27. 선고 2025고단1185 판결](https://www.law.go.kr/LSW/precInfoP.do?precSeq=619545)
+- [대법원 2026.04.16. 선고 2026도477 판결](https://www.law.go.kr/LSW/precInfoP.do?precSeq=619455)
+- [의정부지방법원 2025.12.19. 선고 2025노2686 판결](https://www.law.go.kr/LSW/precInfoP.do?precSeq=619543)
+- [의정부지방법원 남양주지원 2025.08.27. 선고 2025고단1185 판결](https://www.law.go.kr/LSW/precInfoP.do?precSeq=619545)
 - [대법원 주요판결 설명 및 판결문 PDF](https://scourt.go.kr/supreme/news/NewsViewAction2.work?gubun=4&seqnum=11052)
