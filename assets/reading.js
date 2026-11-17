@@ -5,7 +5,14 @@
   function sentenceEnds(text) {
     if (!segmenter) return [];
     return [...segmenter.segment(text)].slice(0, -1)
-      .map(part => part.index + part.segment.trimEnd().length);
+      .map(part => part.index + part.segment.trimEnd().length)
+      .filter(end => {
+        const before = text.slice(0, end);
+        const after = text.slice(end);
+        if (/\d\.$/.test(before) && /^\s*\d{1,2}\./.test(after)) return false;
+        if (/\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.$/.test(before) && /^\s*\S/.test(after)) return false;
+        return true;
+      });
   }
 
   function readingImageWidth(width) {
@@ -17,7 +24,7 @@
   }
   if (typeof document === 'undefined') return;
 
-  document.querySelectorAll('.article-body p, .article-body li').forEach(block => {
+  document.querySelectorAll('.article-body:not(.article-body--preserve) p, .article-body:not(.article-body--preserve) li').forEach(block => {
     // Preserve author-supplied breaks, nested lists, and technical tables verbatim.
     if (block.closest('table, pre, figure') || block.querySelector('br, p, ul, ol, pre, table')) return;
     const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
