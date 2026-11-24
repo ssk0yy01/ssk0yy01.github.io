@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Space Alone 올클리어(진행)"
+title: "Space Alone 올클리어"
 description: "Space Alone 포너블 문제 1~10 풀이와 익스플로잇 실습 기록"
 date: 2026-11-24 00:00:00 +0900
 categories: [ctf-wargame]
