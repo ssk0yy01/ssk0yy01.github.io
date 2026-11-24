@@ -162,6 +162,7 @@ a.credential-card:hover .credential-copy strong { color: #773bd8; }
 .article-body img { max-width: 100%; height: auto; border-radius: 10px; }
 .article-body img[src^="/assets/images/cryptohack-intro-1-10/"] { display: block; max-width: min(100%, 640px); margin-inline: auto; }
 .article-body img[src^="/assets/images/cryptohack-modular-arithmetic-1-11/"] { display: block; max-width: min(100%, 1000px); margin-inline: auto; }
+.article-body img[src^="/assets/images/space-alone/"] { display: block; max-width: min(100%, 760px); margin-inline: auto; }
 
 .completion-proof {
   max-width: 560px;
