@@ -153,6 +153,10 @@ a.credential-card:hover .credential-copy strong { color: #773bd8; }
 .article-meta { color: #888078; display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; }
 .article-meta time { font-size: 14px; }
 .article-body { font-size: 18px; line-height: 1.9; overflow-wrap: anywhere; color: #37322d; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+.article-body.article-body--compact { font-size: 16px; }
+.article-body.article-body--compact h2 { font-size: 23px; }
+.article-body.article-body--compact h3 { font-size: 20px; }
+.article-body.article-body--compact code, .article-body.article-body--compact pre { font-size: 14px; }
 .article-body h2 { font-size: 26px; margin: 40px 0 18px; line-height: 1.5; }
 .article-body h3 { font-size: 22px; line-height: 1.6; }
 .article-body strong { font-weight: 700; color: #211b2a; }
@@ -163,6 +167,7 @@ a.credential-card:hover .credential-copy strong { color: #773bd8; }
 .article-body img[src^="/assets/images/cryptohack-intro-1-10/"] { display: block; max-width: min(100%, 640px); margin-inline: auto; }
 .article-body img[src^="/assets/images/cryptohack-modular-arithmetic-1-11/"] { display: block; max-width: min(100%, 1000px); margin-inline: auto; }
 .article-body img[src^="/assets/images/space-alone/"] { display: block; max-width: min(100%, 530px); margin-left: 0; margin-right: auto; }
+.article-body img[src^="/assets/images/owasp-korea-day-2026/"] { display: block; max-width: min(100%, 550px); margin-left: 0; margin-right: auto; }
 
 .completion-proof {
   max-width: 560px;
