@@ -2,7 +2,7 @@
 layout: post
 title: "OWASP Korea Day 2026 컨퍼런스에 참여하기"
 description: "OWASP Korea Day 2026 컨퍼런스에 참여한 기록과 인상 깊었던 내용을 정리합니다."
-date: 2026-11-28 22:30:00 +0900
+date: 2026-11-28 21:00:00 +0900
 categories: [papers-conferences]
 compact_text: true
 ---
